@@ -46,6 +46,15 @@ extern uint32_t tos_P4;
 extern void     main_P5();
 extern uint32_t tos_P5;
 
+pcb_t create_pcb(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
+    pcb_t new_pcb;
+    memset(&new_pcb, 0, sizeof(pcb_t));
+    new_pcb.ctx.cpsr = cpsr;
+    new_pcb.ctx.pc = pc;
+    new_pcb.ctx.sp = sp;
+    return new_pcb;
+}
+
 void hilevel_handler_rst( ctx_t* ctx              ) {
     
     /* Configure the mechanism for interrupt handling by
@@ -65,7 +74,7 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
     
     GICC0->PMR          = 0x000000F0; // unmask all            interrupts
     GICD0->ISENABLER1  |= 0x00000010; // enable timer          interrupt
-    GICC0->CTLR         = 0x00000001; // enable GIC interface
+    GICC0->CTLR         = 0x00000003; // enable GIC interface
     GICD0->CTLR         = 0x00000001; // enable GIC distributor
     
     
@@ -76,36 +85,21 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-    memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
-    pcb[ 0 ].pid      = 1;
-    pcb[ 0 ].ctx.cpsr = 0x50;
-    pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
-    pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_console  );
-    
-    memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
-    pcb[ 1 ].pid      = 2;
-    pcb[ 1 ].ctx.cpsr = 0x50;
-    pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P3 );
-    pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P3  );
-    
-    memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
-    pcb[ 2 ].pid      = 3;
-    pcb[ 2 ].ctx.cpsr = 0x50;
-    pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P4 );
-    pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P4  );
-    
-    memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
-    pcb[ 3 ].pid      = 4;
-    pcb[ 3 ].ctx.cpsr = 0x50;
-    pcb[ 3 ].ctx.pc   = ( uint32_t )( &main_P5 );
-    pcb[ 3 ].ctx.sp   = ( uint32_t )( &tos_P5  );
-
+    pcb[0] = create_pcb(1, 0x50, (uint32_t)(&main_console), (uint32_t)(&tos_console));
+    create_task(1,1, pcb[0]);
+    pcb[1] = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
+    create_task(1,1, pcb[1]);
+    pcb[2] = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
+    create_task(1,1, pcb[2]);
+    pcb[3] = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
+    create_task(1,1, pcb[3]);
     
     /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
      */
     
-    current = &pcb[ 0 ]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
+    current = &pcb[ 0 ];
+    memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
     
     int_enable_irq();
     
