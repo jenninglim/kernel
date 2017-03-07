@@ -35,4 +35,6 @@ task_struct create_task(int state, int prio, pcb_t pcb);
 
 void add_task(task_struct *new, task_struct *prev);
 
+void next_task(task_struct *current);
+
 #endif

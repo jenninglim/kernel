@@ -12,8 +12,14 @@
 
 pcb_t pcb[ NO_OF_PCB ], *current = NULL;
 int allocatedPCB = 3;
+task_struct task_list;
 
 void scheduler( ctx_t* ctx ) {
+    memcpy(&task_list.pcb.ctx, ctx, sizeof(ctx_t));
+    next_task(&task_list);
+    memcpy(ctx, &task_list.pcb.ctx, sizeof(ctx_t));
+    current = &task_list.pcb;
+    /*
     if      ( current == &pcb[ 0 ] ) {
         memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
         memcpy( ctx, &pcb[ 1 ].ctx, sizeof( ctx_t ) );
@@ -34,6 +40,7 @@ void scheduler( ctx_t* ctx ) {
         memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
         current = &pcb[ 0 ];
     }
+    */
     return;
 }
 
@@ -85,14 +92,25 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-    pcb[0] = create_pcb(1, 0x50, (uint32_t)(&main_console), (uint32_t)(&tos_console));
-    create_task(1,1, pcb[0]);
-    pcb[1] = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    create_task(1,1, pcb[1]);
-    pcb[2] = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    create_task(1,1, pcb[2]);
-    pcb[3] = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    create_task(1,1, pcb[3]);
+    task_struct task1, task2 , task3;
+    pcb_t temp_pcb;
+
+    memset(&task_list, 0, sizeof(task_struct));
+
+    temp_pcb = create_pcb(1, 0x50, (uint32_t)(&main_console), (uint32_t)(&tos_console));
+    task_list = create_task(1,1, temp_pcb);
+
+    temp_pcb = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
+    task1 = create_task(1,1, temp_pcb);
+    add_task(&task_list, &task1);
+
+    temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
+    task2 = create_task(1,1, temp_pcb);
+    add_task(&task_list, &task2);
+
+    temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
+    task3 = create_task(1,1, temp_pcb);
+    add_task(&task_list, &task3);
     
     /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
