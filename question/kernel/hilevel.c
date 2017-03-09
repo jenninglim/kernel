@@ -10,38 +10,32 @@
  *   can be created, and neither is able to complete.
  */
 
-pcb_t pcb[ NO_OF_PCB ], *current = NULL;
-int allocatedPCB = 3;
-task_struct task_list;
+LIST_HEAD(llhead);
+
+void dispatch(task_struct * new, ctx_t * ctx) {
+    memcpy(ctx, &new->pcb.ctx, sizeof(ctx_t));
+    new->state = 1;
+}
+
+void undispatch(task_struct * prev, ctx_t * ctx) {
+    memcpy(&prev->pcb.ctx, ctx, sizeof(ctx_t));
+    prev->state = 0;
+}
 
 void scheduler( ctx_t* ctx ) {
-    memcpy(&task_list.pcb.ctx, ctx, sizeof(ctx_t));
-    next_task(&task_list);
-    memcpy(ctx, &task_list.pcb.ctx, sizeof(ctx_t));
-    current = &task_list.pcb;
-    /*
-    if      ( current == &pcb[ 0 ] ) {
-        memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
-        memcpy( ctx, &pcb[ 1 ].ctx, sizeof( ctx_t ) );
-        current = &pcb[ 1 ];
+/*
+ *round robin
+ */
+    list_head *node;
+
+    list_for_each(node, & llhead) {
+        if (task_current_entry(node)->state == 1) {
+            undispatch(task_current_entry(node), ctx);
+            dispatch(task_next_entry(node), ctx);
+            return;
+        }
+
     }
-    else if ( current == &pcb[ 1 ] ) {
-        memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-        memcpy( ctx, &pcb[ 2 ].ctx, sizeof( ctx_t ) );
-        current = &pcb[ 2 ];
-    }
-    else if ( current == &pcb[ 2 ] ) {
-        memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
-        memcpy( ctx, &pcb[ 3 ].ctx, sizeof( ctx_t ) );
-        current = &pcb[ 3 ];
-    }
-    else if ( current == &pcb[ 3 ] ) {
-        memcpy( &pcb[ 3 ].ctx, ctx, sizeof( ctx_t ) );
-        memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
-        current = &pcb[ 0 ];
-    }
-    */
-    return;
 }
 
 extern void     main_console();
@@ -62,7 +56,7 @@ pcb_t create_pcb(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
     return new_pcb;
 }
 
-void hilevel_handler_rst( ctx_t* ctx              ) {
+void hilevel_handler_rst(ctx_t* ctx) {
     
     /* Configure the mechanism for interrupt handling by
      *
@@ -83,7 +77,9 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
     GICD0->ISENABLER1  |= 0x00000010; // enable timer          interrupt
     GICC0->CTLR         = 0x00000003; // enable GIC interface
     GICD0->CTLR         = 0x00000001; // enable GIC distributor
-    
+
+    pcb_t temp_pcb;
+    task_struct * temp_task;
     
     /* Initialise PCBs representing processes stemming from execution of
      * the two user programs.  Note in each case that
@@ -92,34 +88,27 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-    task_struct task1, task2 , task3;
-    pcb_t temp_pcb;
-
-    memset(&task_list, 0, sizeof(task_struct));
-
-    temp_pcb = create_pcb(1, 0x50, (uint32_t)(&main_console), (uint32_t)(&tos_console));
-    task_list = create_task(1,1, temp_pcb);
-
+    temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
+    temp_task = &create_task(0,1, temp_pcb);
+    list_add(&temp_task.tasks, &llhead);
+    
     temp_pcb = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    task1 = create_task(1,1, temp_pcb);
-    add_task(&task_list, &task1);
+    temp_task = &create_task(0,1, temp_pcb); 
+    list_add(&temp_task2.tasks, &llhead);
+
+    dispatch(task_current_entry(llhead.next), ctx);
+
+
 
     temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    task2 = create_task(1,1, temp_pcb);
-    add_task(&task_list, &task2);
+    temp_task = create_task(0,1, temp_pcb);
+    list_add(&temp_task.tasks, &llhead);
 
-    temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    task3 = create_task(1,1, temp_pcb);
-    add_task(&task_list, &task3);
-    
-    /* Once the PCBs are initialised, we (arbitrarily) select one to be
+        /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
      */
     
-    current = &pcb[ 0 ];
-    memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
-    
-    int_enable_irq();
+        //int_enable_irq();
     
     return;
 }
@@ -171,13 +160,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x03 : { // 0x03 => fork()
-            memset(&pcb[allocatedPCB], 0, sizeof(pcb_t));
-            memcpy(&pcb[allocatedPCB], current, sizeof(current));
-            pcb[ allocatedPCB ].pid      = allocatedPCB;
-            pcb[ allocatedPCB ].ctx.cpsr = 0x50;
-            pcb[ allocatedPCB ].ctx.pc   = ( uint32_t )( &main_P5 );
-            pcb[ allocatedPCB ].ctx.sp   = ( uint32_t )( &tos_P5  );
-            allocatedPCB++;
+            //TODO
         }
         default   : { // 0x?? => unknown/unsupported
             break;
