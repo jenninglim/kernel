@@ -12,12 +12,13 @@
 
 LIST_HEAD(llhead);
 
-void dispatch(task_struct * new, ctx_t * ctx) {
+
+void dispatch(task_t * new, ctx_t * ctx) {
     memcpy(ctx, &new->pcb.ctx, sizeof(ctx_t));
     new->state = 1;
 }
 
-void undispatch(task_struct * prev, ctx_t * ctx) {
+void undispatch(task_t * prev, ctx_t * ctx) {
     memcpy(&prev->pcb.ctx, ctx, sizeof(ctx_t));
     prev->state = 0;
 }
@@ -50,10 +51,22 @@ extern uint32_t tos_P5;
 pcb_t create_pcb(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
     pcb_t new_pcb;
     memset(&new_pcb, 0, sizeof(pcb_t));
+    new_pcb.pid = pid;
     new_pcb.ctx.cpsr = cpsr;
     new_pcb.ctx.pc = pc;
     new_pcb.ctx.sp = sp;
     return new_pcb;
+}
+void add_task(list_head * head, pcb_t pcb) {
+    task_t temp_task;
+    temp_task.state = 0;
+    temp_task.prio = 1;
+    temp_task.pcb = pcb;
+    INIT_LIST_HEAD(&temp_task.tasks);
+    set_task_prio(&temp_task,0);
+    list_add(&temp_task.tasks, head);
+    
+    return;
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
@@ -79,8 +92,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
     GICD0->CTLR         = 0x00000001; // enable GIC distributor
 
     pcb_t temp_pcb;
-    task_struct * temp_task;
-    
     /* Initialise PCBs representing processes stemming from execution of
      * the two user programs.  Note in each case that
      *
@@ -89,20 +100,16 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    temp_task = &create_task(0,1, temp_pcb);
-    list_add(&temp_task.tasks, &llhead);
+    add_task(&llhead, temp_pcb);
+    //task_t temp_task = create_task(temp_pcb);
+    //list_add(&temp_task.tasks, &llhead);
     
     temp_pcb = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    temp_task = &create_task(0,1, temp_pcb); 
-    list_add(&temp_task2.tasks, &llhead);
+    add_task(&llhead, temp_pcb);
 
     dispatch(task_current_entry(llhead.next), ctx);
-
-
-
+    
     temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    temp_task = create_task(0,1, temp_pcb);
-    list_add(&temp_task.tasks, &llhead);
 
         /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
