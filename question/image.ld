@@ -7,14 +7,7 @@ SECTIONS {
   .data : {                         *(.data        ) }
   /* place bss  segment(s)           */        
   .bss  : {                         *(.bss         ) }
-  /* place */
-  .heap : {
-      end = .;
-      _heap_start = .;
-      . = . + 0 x00001000 ;
-      _heap_end = .;
-  }
-  /* align       address (per AAPCS) */
+ /* align       address (per AAPCS) */
   .       = ALIGN( 8 );        
   /* allocate stack for irq mode     */
   .       = . + 0x00001000;  

@@ -12,33 +12,6 @@
 
 LIST_HEAD(llhead);
 
-
-void dispatch(task_t * new, ctx_t * ctx) {
-    memcpy(ctx, &new->pcb.ctx, sizeof(ctx_t));
-    new->state = 1;
-}
-
-void undispatch(task_t * prev, ctx_t * ctx) {
-    memcpy(&prev->pcb.ctx, ctx, sizeof(ctx_t));
-    prev->state = 0;
-}
-
-void scheduler( ctx_t* ctx ) {
-/*
- *round robin
- */
-    list_head *node;
-
-    list_for_each(node, & llhead) {
-        if (task_current_entry(node)->state == 1) {
-            undispatch(task_current_entry(node), ctx);
-            dispatch(task_next_entry(node), ctx);
-            return;
-        }
-
-    }
-}
-
 extern void     main_console();
 extern uint32_t tos_console;
 extern void     main_P3();
@@ -48,15 +21,7 @@ extern uint32_t tos_P4;
 extern void     main_P5();
 extern uint32_t tos_P5;
 
-pcb_t create_pcb(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
-    pcb_t new_pcb;
-    memset(&new_pcb, 0, sizeof(pcb_t));
-    new_pcb.pid = pid;
-    new_pcb.ctx.cpsr = cpsr;
-    new_pcb.ctx.pc = pc;
-    new_pcb.ctx.sp = sp;
-    return new_pcb;
-}
+
 void add_task(list_head * head, pcb_t pcb) {
     task_t temp_task;
     temp_task.state = 0;
@@ -65,7 +30,6 @@ void add_task(list_head * head, pcb_t pcb) {
     INIT_LIST_HEAD(&temp_task.tasks);
     set_task_prio(&temp_task,0);
     list_add(&temp_task.tasks, head);
-    
     return;
 }
 
@@ -100,22 +64,26 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    add_task(&llhead, temp_pcb);
-    //task_t temp_task = create_task(temp_pcb);
-    //list_add(&temp_task.tasks, &llhead);
+    task_t temp_task = create_task(temp_pcb);
+    list_add(&temp_task.tasks, &llhead);
     
     temp_pcb = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    add_task(&llhead, temp_pcb);
+    task_t temp_task1 = create_task(temp_pcb);
+    list_add(&temp_task1.tasks, &llhead);
+    
+    temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
+    task_t temp_task2 = create_task(temp_pcb);
+    list_add(&temp_task2.tasks, &llhead);
+    
 
     dispatch(task_current_entry(llhead.next), ctx);
     
-    temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
 
         /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
      */
     
-        //int_enable_irq();
+    int_enable_irq();
     
     return;
 }
@@ -129,7 +97,7 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     if( id == GIC_SOURCE_TIMER0 ) {
         PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
-        scheduler( ctx );
+        scheduler( ctx, &llhead );
         //Switch process
     }
     
@@ -151,7 +119,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     
     switch( id ) {
         case 0x00 : { // 0x00 => yield()
-            scheduler( ctx );
+            scheduler( ctx, &llhead );
             break;
         }
         case 0x01 : { // 0x01 => write( fd, x, n )

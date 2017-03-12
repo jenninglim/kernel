@@ -20,44 +20,25 @@ typedef struct {
     volatile int state; // program state
     int prio;
     pcb_t pcb;
-    //struct task_t *parent;
     list_head tasks;
 } task_t;
 
-/*
- * set a specific task to a specific state.
- */
+pcb_t create_pcb(pid_t pid, uint32_t cpsp, uint32_t pc, uint32_t sp);
 task_t create_task(pcb_t pcb); 
 
-static inline void set_task_state(task_t *task, int state) {
-    task->state = state;
-    return;
-}
+void dispatch(task_t * new, ctx_t * ctx);
 
-static inline void set_task_prio(task_t *task, int prio) {
-    task->prio = prio;
-    return;
-}
+void undispatch(task_t * prev, ctx_t * ctx);
 
-static inline void set_task_pcb(task_t *task, pcb_t pcb) {
-    task->pcb = pcb;
-    return;
-}
-/*
-static inline task_t create_task(pcb_t pcb) {
-    task_t new_task;
-	new_task.state = 0;
-    new_task.prio = 1;
-	new_task.pcb = pcb;
-    INIT_LIST_HEAD(&new_task.tasks);
-    return new_task;
-}
-*/
+void scheduler(ctx_t * ctx, list_head * head);
 
-static inline void add_task_next(task_t *new, list_head *head) {
-    list_add(&new->tasks, head);
-    return;
-}
+void set_task_state(task_t *task, int state);
+
+void set_task_prio(task_t *task, int prio);
+
+void set_task_pcb(task_t *task, pcb_t pcb);
+
+void add_task_next(task_t *new, list_head *head);
 
 /*
 static inline void add_task_prev(task_t *new, list_head *head) {
@@ -72,4 +53,5 @@ static inline void add_task(list_head * head, pcb_t pcb) {
     return;
 }
 */
+
 #endif

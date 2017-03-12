@@ -38,11 +38,7 @@ typedef struct list_head {
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name)
 
-static inline void INIT_LIST_HEAD(struct list_head *list)
-{
-	WRITE_ONCE(list->next, list);
-	list->prev = list;
-}
+void INIT_LIST_HEAD(list_head * list);
 
 /*
  * Insert new entry between two known consecutive entries.
@@ -50,53 +46,13 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
  */
 
 void list_add(list_head *new, list_head *head);
-/*
-static inline void _list_add(list_head *new, list_head *prev, list_head *next) {
-    next->prev = new;
-    new->next = next;
-    new->prev = prev;
-    WRITE_ONCE(prev->next, new);
-}
 
-
-static inline void list_add(list_head *new, list_head *head) {
-    _list_add(new, head, head->next);
-}
-*/
-
-/*
- * Delete list entry by using previous and next entries.
- */
-
-/*
-static inline void _list_del(list_head *prev, list_head *next) {
-    next->prev = prev;
-    WRITE_ONCE(prev->next, next);
-}
-*/
+void list_add_tail(list_head * new, list_head * head);
 
 /*
  * Delete list entry.
  */
-
-/*
-static inline void list_del(list_head *entry) {
-    _list_del(entry->prev, entry->next);
-    entry->next = NULL;
-    entry->prev = NULL;
-
-}
-*/
-
-/*
- * Insert a new entry before a head.
- */
-
-/*
-static inline void list_add_tail(list_head *new, list_head *head) {
-	_list_add(new, head->prev, head);
-}
-*/
+void list_del(list_head * entry);
 
 #endif
 
