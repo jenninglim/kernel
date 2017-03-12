@@ -19,12 +19,12 @@
 typedef struct {
     volatile int state; // program state
     int prio;
-    pcb_t pcb;
+    pid_t pid;
+    ctx_t ctx;
     list_head tasks;
 } task_t;
 
-pcb_t create_pcb(pid_t pid, uint32_t cpsp, uint32_t pc, uint32_t sp);
-task_t create_task(pcb_t pcb); 
+task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp); 
 
 void dispatch(task_t * new, ctx_t * ctx);
 
@@ -36,7 +36,6 @@ void set_task_state(task_t *task, int state);
 
 void set_task_prio(task_t *task, int prio);
 
-void set_task_pcb(task_t *task, pcb_t pcb);
 
 void add_task_next(task_t *new, list_head *head);
 

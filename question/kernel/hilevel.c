@@ -21,7 +21,7 @@ extern uint32_t tos_P4;
 extern void     main_P5();
 extern uint32_t tos_P5;
 
-
+/*
 void add_task(list_head * head, pcb_t pcb) {
     task_t temp_task;
     temp_task.state = 0;
@@ -32,6 +32,7 @@ void add_task(list_head * head, pcb_t pcb) {
     list_add(&temp_task.tasks, head);
     return;
 }
+*/
 
 void hilevel_handler_rst(ctx_t* ctx) {
     
@@ -55,7 +56,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
     GICC0->CTLR         = 0x00000003; // enable GIC interface
     GICD0->CTLR         = 0x00000001; // enable GIC distributor
 
-    pcb_t temp_pcb;
     /* Initialise PCBs representing processes stemming from execution of
      * the two user programs.  Note in each case that
      *
@@ -63,16 +63,13 @@ void hilevel_handler_rst(ctx_t* ctx) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-    temp_pcb = create_pcb(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    task_t temp_task = create_task(temp_pcb);
+    task_t temp_task = create_task(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
     list_add(&temp_task.tasks, &llhead);
     
-    temp_pcb = create_pcb(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    task_t temp_task1 = create_task(temp_pcb);
+    task_t temp_task1 = create_task(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
     list_add(&temp_task1.tasks, &llhead);
     
-    temp_pcb = create_pcb(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    task_t temp_task2 = create_task(temp_pcb);
+    task_t temp_task2 = create_task(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
     list_add(&temp_task2.tasks, &llhead);
     
 

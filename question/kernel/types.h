@@ -20,10 +20,5 @@ typedef struct {
         uint32_t cpsr, pc, gpr[ 13 ], sp, lr;
 } ctx_t;
 
-typedef struct {
-        pid_t pid;
-            ctx_t ctx;
-} pcb_t;
-
 #endif
 
