@@ -10,6 +10,7 @@
  *   can be created, and neither is able to complete.
  */
 
+runqueue_t rq;
 LIST_HEAD(llhead);
 
 extern void     main_console();
@@ -22,6 +23,7 @@ extern void     main_P5();
 extern uint32_t tos_P5;
 
 void hilevel_handler_rst(ctx_t* ctx) {
+    rq = RQ_INIT();
     
     /* Configure the mechanism for interrupt handling by
      *
@@ -50,21 +52,25 @@ void hilevel_handler_rst(ctx_t* ctx) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-
+    
     task_t * test = malloc(sizeof(task_t));
     * test = create_task(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
     add_task_last(test, &llhead);
+    add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
     * test = create_task(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
     add_task_last(test, &llhead);
+    add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
     * test = create_task(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
     add_task_last(test, &llhead);
+    add_to_active(test, &rq);
     
-
-    dispatch(task_current_entry(llhead.next), ctx);
+    sched_rq(&rq);
+    dispatch(rq.current, ctx);
+    //dispatch(task_current_entry(llhead.next), ctx);
     
 
         /* Once the PCBs are initialised, we (arbitrarily) select one to be

@@ -24,13 +24,14 @@ void scheduler( ctx_t* ctx, list_head * head ) {
     return;
 }
 
-
-bool sched_prio(task_t * current, prio_array_t * array) {
-    list_head *node = malloc(sizeof(list_head));
+bool sched_prio(task_t ** current, prio_array_t * array) {
+    list_head * node = malloc(sizeof(list_head));
+    list_head head;
     for (int i = 0; i < MAX_PRIO; i++) {
-        list_for_each(node, &array->queue[i]) {
-            current = task_current_entry(node);
-            array->nr_active -= 1;
+        head = array->queue[i];
+        list_for_each(node, &head) {
+            * current = task_current_entry(node);
+            list_move_to_end(node, &head);
             return true;
         }
     }
@@ -39,6 +40,6 @@ bool sched_prio(task_t * current, prio_array_t * array) {
 }
 
 void sched_rq(runqueue_t * rq) {
-    
+    sched_prio(&rq->current, &rq->arrays[0]);
     return;
 }

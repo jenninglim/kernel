@@ -54,5 +54,12 @@ void list_add_tail(list_head * new, list_head * head);
  */
 void list_del(list_head * entry);
 
+/*
+ * Moves specified entry to end.
+ */
+
+void list_move_to_end(list_head * entry, list_head * head);
+
+
 #endif
 

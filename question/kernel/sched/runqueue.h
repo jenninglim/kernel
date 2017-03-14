@@ -19,7 +19,9 @@ typedef struct runqueue {
 /*
  * Initialise runqueue.
  */
+
 void init_rq(runqueue_t * rq);
+runqueue_t RQ_INIT();
 
 /*
  * Move to expired.

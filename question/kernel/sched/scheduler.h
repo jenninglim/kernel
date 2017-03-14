@@ -34,7 +34,7 @@ void scheduler(ctx_t * ctx, list_head * head);
  * Returns true if sucessful, false otherwise.
 */
 
-bool sched_prio(task_t * current, prio_array_t * array);
+bool sched_prio(task_t ** current, prio_array_t * array);
 
 /*
  * Schedule
