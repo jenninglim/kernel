@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 // Include functionality relating to the platform.
 
@@ -18,7 +19,7 @@
 
 #include "lolevel.h"
 #include     "int.h"
-#include "scheduler.h"
+#include "sched/scheduler.h"
 
 /* The kernel source code is made simpler via three type definitions:
  *

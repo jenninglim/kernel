@@ -21,19 +21,6 @@ extern uint32_t tos_P4;
 extern void     main_P5();
 extern uint32_t tos_P5;
 
-/*
-void add_task(list_head * head, pcb_t pcb) {
-    task_t temp_task;
-    temp_task.state = 0;
-    temp_task.prio = 1;
-    temp_task.pcb = pcb;
-    INIT_LIST_HEAD(&temp_task.tasks);
-    set_task_prio(&temp_task,0);
-    list_add(&temp_task.tasks, head);
-    return;
-}
-*/
-
 void hilevel_handler_rst(ctx_t* ctx) {
     
     /* Configure the mechanism for interrupt handling by
@@ -63,14 +50,18 @@ void hilevel_handler_rst(ctx_t* ctx) {
      *   mode, with IRQ interrupts enabled, and
      * - the PC and SP values matche the entry point and top of stack.
      */
-    task_t temp_task = create_task(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    list_add(&temp_task.tasks, &llhead);
+
+    task_t * test = malloc(sizeof(task_t));
+    * test = create_task(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
+    add_task_last(test, &llhead);
     
-    task_t temp_task1 = create_task(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    list_add(&temp_task1.tasks, &llhead);
+    test = malloc(sizeof(task_t));
+    * test = create_task(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
+    add_task_last(test, &llhead);
     
-    task_t temp_task2 = create_task(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    list_add(&temp_task2.tasks, &llhead);
+    test = malloc(sizeof(task_t));
+    * test = create_task(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
+    add_task_last(test, &llhead);
     
 
     dispatch(task_current_entry(llhead.next), ctx);

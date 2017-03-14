@@ -5,6 +5,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <sys/types.h>
+#include <errno.h>
+
 // Define a type that that captures a Process IDentifier (PID).
 
 typedef int pid_t;
