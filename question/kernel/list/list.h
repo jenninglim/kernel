@@ -60,6 +60,4 @@ void list_del(list_head * entry);
 
 void list_move_to_end(list_head * entry, list_head * head);
 
-
 #endif
-

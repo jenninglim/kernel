@@ -26,8 +26,8 @@ runqueue_t RQ_INIT() {
 
 void add_to_active(task_t * task, runqueue_t * rq) {
     int prio = task->prio;
-    list_head * head = &rq->arrays[0].queue[prio];
     rq->arrays[0].nr_active ++;
+    list_head * head = &rq->arrays[0].queue[prio];
     add_task_last(task, head);
     return;
 }

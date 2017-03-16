@@ -18,6 +18,18 @@ task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
     return new_task;
 }
 
+void TASK_INIT(task_t * new_task, pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
+    ctx_t new_ctx = {
+        .cpsr = cpsr,
+        .pc = pc,
+        .sp = sp
+    };
+    new_task->state = 0;
+    INIT_LIST_HEAD(&new_task->node);
+    new_task->prio = 0;
+    new_task->ctx = new_ctx;
+}
+
 void set_task_state(task_t * task, int state) {
     task->state = state;
     return;

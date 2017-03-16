@@ -27,6 +27,8 @@ typedef struct {
 
 task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp); 
 
+void TASK_INIT(task_t * new_task,pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp);
+
 void set_task_state(task_t * task, int state);
 
 void set_task_prio(task_t * task, int prio);

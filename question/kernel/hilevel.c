@@ -23,7 +23,7 @@ extern void     main_P5();
 extern uint32_t tos_P5;
 
 void hilevel_handler_rst(ctx_t* ctx) {
-    rq = RQ_INIT();
+    init_rq(&rq);
     
     /* Configure the mechanism for interrupt handling by
      *
@@ -54,18 +54,18 @@ void hilevel_handler_rst(ctx_t* ctx) {
      */
     
     task_t * test = malloc(sizeof(task_t));
-    * test = create_task(4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    add_task_last(test, &llhead);
+    TASK_INIT(test, 4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
+    add_task_next(test, &llhead);
     add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
-    * test = create_task(2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    add_task_last(test, &llhead);
+    TASK_INIT(test,2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
+    add_task_next(test, &llhead);
     add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
-    * test = create_task(3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    add_task_last(test, &llhead);
+    TASK_INIT(test, 3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
+    add_task_next(test, &llhead);
     add_to_active(test, &rq);
     
     sched_rq(&rq);
