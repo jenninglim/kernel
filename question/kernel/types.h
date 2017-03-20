@@ -20,5 +20,8 @@ typedef struct {
         uint32_t cpsr, pc, gpr[ 13 ], sp, lr;
 } ctx_t;
 
+void INIT_CTX(ctx_t * ctx, uint32_t cpsr, uint32_t pc, uint32_t sp);
+
+
 #endif
 

@@ -21,7 +21,6 @@ typedef struct runqueue {
  */
 
 void init_rq(runqueue_t * rq);
-runqueue_t RQ_INIT();
 
 /*
  * Move to expired.
@@ -46,6 +45,12 @@ void current_expired(runqueue_t * rq);
  */
 
 void reallocated_time(runqueue_t * rq);
+
+/*
+ *
+ */
+
+void rq_add_new_task(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t offset);
 
 /*
  * Run idle process

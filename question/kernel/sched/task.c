@@ -5,26 +5,11 @@
 
 extern uint32_t tos_usr;
 
-task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
+void TASK_INIT(task_t * new_task, pid_t pid, uint32_t pc, uint32_t offset) {
     ctx_t new_ctx = {
-        .cpsr = cpsr,
+        .cpsr = 0x50,
         .pc = pc,
-        .sp = sp
-    };
-    task_t new_task = {
-        .state = 0,
-        .node = LIST_HEAD_INIT(new_task.node),
-        .prio = 1,
-        .ctx = new_ctx
-    };
-    return new_task;
-}
-
-void TASK_INIT(task_t * new_task, pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t offset) {
-    ctx_t new_ctx = {
-        .cpsr = cpsr,
-        .pc = pc,
-        .sp = tos_usr + offset
+        .sp = (uint32_t) (&tos_usr + offset)
     };
     new_task->state = 0;
     INIT_LIST_HEAD(&new_task->node);

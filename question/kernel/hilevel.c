@@ -17,7 +17,6 @@ extern uint32_t tos_console;
 extern void     main_P3();
 extern void     main_P4();
 extern void     main_P5();
-extern uint32_t tos_usr;
 
 void hilevel_handler_rst(ctx_t* ctx) {
     init_rq(&rq);
@@ -50,17 +49,11 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
-    task_t * test = malloc(sizeof(task_t));
-    TASK_INIT(test, 4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_usr  ));
-    add_to_active(test, &rq);
+    rq_add_new_task(&rq, 4, ( uint32_t )( &main_P5 ), ( uint32_t )( 0x00000000 ));
     
-    test = malloc(sizeof(task_t));
-    TASK_INIT(test,2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_usr + 0x00001000));
-    add_to_active(test, &rq);
+    rq_add_new_task(&rq, 2, ( uint32_t )( &main_P3 ), ( uint32_t )( 0x00001000 ));
     
-    test = malloc(sizeof(task_t));
-    TASK_INIT(test, 3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_usr + 0x00010000 ));
-    add_to_active(test, &rq);
+    rq_add_new_task(&rq, 3, ( uint32_t )( &main_P4 ), ( uint32_t )( 0x00010000 ));
     
     sched_rq(&rq);
     dispatch(rq.current, ctx);
