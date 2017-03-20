@@ -11,16 +11,13 @@
  */
 
 runqueue_t rq;
-LIST_HEAD(llhead);
 
 extern void     main_console();
 extern uint32_t tos_console;
 extern void     main_P3();
-extern uint32_t tos_P3;
 extern void     main_P4();
-extern uint32_t tos_P4;
 extern void     main_P5();
-extern uint32_t tos_P5;
+extern uint32_t tos_usr;
 
 void hilevel_handler_rst(ctx_t* ctx) {
     init_rq(&rq);
@@ -54,23 +51,19 @@ void hilevel_handler_rst(ctx_t* ctx) {
      */
     
     task_t * test = malloc(sizeof(task_t));
-    TASK_INIT(test, 4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_P5  ));
-    add_task_next(test, &llhead);
+    TASK_INIT(test, 4, 0x50, ( uint32_t )( &main_P5 ), ( uint32_t )( &tos_usr  ));
     add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
-    TASK_INIT(test,2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_P3  ));
-    add_task_next(test, &llhead);
+    TASK_INIT(test,2, 0x50, ( uint32_t )( &main_P3 ), ( uint32_t )( &tos_usr + 0x00001000));
     add_to_active(test, &rq);
     
     test = malloc(sizeof(task_t));
-    TASK_INIT(test, 3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_P4  ));
-    add_task_next(test, &llhead);
+    TASK_INIT(test, 3, 0x50, ( uint32_t )( &main_P4 ), ( uint32_t )( &tos_usr + 0x00010000 ));
     add_to_active(test, &rq);
     
     sched_rq(&rq);
     dispatch(rq.current, ctx);
-    //dispatch(task_current_entry(llhead.next), ctx);
     
 
         /* Once the PCBs are initialised, we (arbitrarily) select one to be
@@ -91,7 +84,8 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     if( id == GIC_SOURCE_TIMER0 ) {
         PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
-        scheduler( ctx, &llhead );
+        sched_rq(&rq);
+        dispatch(rq.current,ctx);
         //Switch process
     }
     
@@ -113,7 +107,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     
     switch( id ) {
         case 0x00 : { // 0x00 => yield()
-            scheduler( ctx, &llhead );
+            sched_rq(&rq);
+            dispatch(rq.current, ctx);
             break;
         }
         case 0x01 : { // 0x01 => write( fd, x, n )
@@ -130,6 +125,12 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         case 0x03 : { // 0x03 => fork()
             //TODO
+            //Create a new PCB for child
+            //Copy parent
+            //Set child processs stack space
+            //new pid
+            //gpr[0] for parent
+            //gpr[0] for child is 0
         }
         default   : { // 0x?? => unknown/unsupported
             break;

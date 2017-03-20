@@ -3,6 +3,8 @@
  * For manipulation of tasks.
  */
 
+extern uint32_t tos_usr;
+
 task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
     ctx_t new_ctx = {
         .cpsr = cpsr,
@@ -18,11 +20,11 @@ task_t create_task(pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
     return new_task;
 }
 
-void TASK_INIT(task_t * new_task, pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t sp) {
+void TASK_INIT(task_t * new_task, pid_t pid, uint32_t cpsr, uint32_t pc, uint32_t offset) {
     ctx_t new_ctx = {
         .cpsr = cpsr,
         .pc = pc,
-        .sp = sp
+        .sp = tos_usr + offset
     };
     new_task->state = 0;
     INIT_LIST_HEAD(&new_task->node);

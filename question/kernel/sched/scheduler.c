@@ -25,13 +25,13 @@ void scheduler( ctx_t* ctx, list_head * head ) {
 }
 
 bool sched_prio(task_t ** current, prio_array_t * array) {
-    list_head * node = malloc(sizeof(list_head));
-    list_head head;
+    list_head * node;
+    list_head * head;
     for (int i = 0; i < MAX_PRIO; i++) {
-        head = array->queue[i];
-        list_for_each(node, &head) {
-            * current = task_current_entry(node);
-            list_move_to_end(node, &head);
+        head = &array->queue[i];
+        list_for_each(node, head) {
+            *current = task_current_entry(node);
+            list_move_to_end(node, head);
             return true;
         }
     }

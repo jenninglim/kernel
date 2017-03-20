@@ -1,8 +1,8 @@
 #include "runqueue.h"
 
 void init_rq(runqueue_t * rq) {
-    rq->current = NULL;
-    rq->idle = NULL;
+    rq->current = malloc(sizeof(task_t));
+    rq->idle = malloc(sizeof(task_t));
 
     init_prio_array(&rq->arrays[1]);
     init_prio_array(&rq->arrays[0]);
@@ -15,7 +15,7 @@ void init_rq(runqueue_t * rq) {
 
 runqueue_t RQ_INIT() {
     runqueue_t rq;
-    rq.current = NULL;
+    rq.current = malloc(sizeof(task_t));
     rq.idle = malloc(sizeof(task_t));
     init_prio_array(&rq.arrays[0]);
     init_prio_array(&rq.arrays[1]);
