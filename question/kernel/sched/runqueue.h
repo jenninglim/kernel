@@ -21,7 +21,7 @@ extern uint32_t tos_console;
 typedef struct runqueue {
     task_t * current;
     task_t * idle;
-    int32_t upid;
+    pid_t upid;
     int elapsed_time;
     prio_array_t * active;
     prio_array_t * expired;
@@ -62,9 +62,11 @@ void reallocate_time(runqueue_t * rq);
  *
  */
 
-void rq_add_new_task(runqueue_t * rq, uint32_t pc);
+task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx);
 
-void rq_add_console(runqueue_t * rq);
+task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc);
+
+task_t * rq_add_console(runqueue_t * rq);
 
 /*
  * Run idle process

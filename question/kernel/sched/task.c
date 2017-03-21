@@ -15,10 +15,9 @@ void TASK_INIT(task_t * new_task, uint32_t pc, uint32_t sp) {
     new_task->ctx = new_ctx;
 }
 
-void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t sp) {
+void task_clone(task_t * task, ctx_t * ctx, uint32_t sp) {
     update_ctx(&task->ctx, ctx);
     task->ctx.sp = sp;
-    task->pid = pid;
 }
 
 void set_task_state(task_t * task, int state) {
@@ -38,4 +37,9 @@ void add_task_next(task_t *new, list_head *head) {
 
 void add_task_last(task_t * new, list_head * head) {
     list_add_tail(&new->node, head);
+}
+
+void set_task_pid(task_t * task, int32_t pid) {
+    task->pid = pid;
+    return;
 }

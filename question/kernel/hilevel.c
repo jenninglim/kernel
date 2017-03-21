@@ -49,11 +49,11 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
-    rq_add_new_task(&rq, ( uint32_t )( &main_P5 ) );
+    //rq_add_new_task(&rq, ( uint32_t )( &main_P5 ) );
     
-    rq_add_new_task(&rq, ( uint32_t )( &main_P3 ) );
+    //rq_add_new_task(&rq, ( uint32_t )( &main_P3 ) );
     rq_add_console(&rq);
-    rq_add_new_task(&rq, ( uint32_t )( &main_P4 ) );
+    //rq_add_new_task(&rq, ( uint32_t )( &main_P4 ) );
     
     
 
@@ -121,16 +121,24 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         case 0x03 : { // 0x03 => fork()
             //TODO
-            int new_loc = 0;
             //Create a new PCB for child
-            task_t * child = malloc(sizeof(task_t));
+            task_t * child = rq_add_clone(&rq, ctx);
+            ctx->gpr[0] = child->pid;
+            child->ctx.gpr[0] = 0;
+            break;
             //Copy parent
             //Set child processs stack space
             //new pid
             //gpr[0] for parent
             //gpr[0] for child is 0
         }
+        case 0x05 : { // 0x05 => exec( pc )
+            //rq.current->ctx.pc = ctx->gpr[0];
+            ctx->pc = ctx->gpr[0];
+            break;
+        }
         default   : { // 0x?? => unknown/unsupported
+
             break;
         }
     }

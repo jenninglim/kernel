@@ -37,4 +37,8 @@ void add_task_next(task_t * new, list_head * head);
 
 void add_task_last(task_t * new, list_head * head);
 
+void set_task_pid(task_t * task, int32_t pid);
+
+void task_clone(task_t * new, ctx_t * source, uint32_t sp);
+
 #endif
