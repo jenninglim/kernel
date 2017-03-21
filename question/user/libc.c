@@ -130,6 +130,17 @@ int kill( int pid, int x ) {
   return r;
 }
 
+void set_prio( pid_t prio ) {
+
+  asm volatile( "mov r0, %1 \n" // assign r0 =  pid
+                "svc %0     \n" // make system call SYS_KILL
+              : 
+              : "I" (SYS_PRIO), "r" (prio)
+              : "r0" );
+
+  return;
+}
+
 register char * stack_ptr asm ("sp");
 
 /* Heap limit returned from SYS_HEAPINFO Angel semihost call.  */

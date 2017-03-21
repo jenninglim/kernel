@@ -37,11 +37,14 @@ void scheduler(ctx_t * ctx, list_head * head);
 bool sched_prio(task_t ** current, prio_array_t * array);
 
 /*
- * Schedule
+ * Schedule the next avaible task depending on priority
  */
 
 void sched_rq(runqueue_t * rq, ctx_t * ctx);
 
+/*
+ * Update rq with elapsed time.
+ */
 void time_passed(runqueue_t * rq);
 
 #endif

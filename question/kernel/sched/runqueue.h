@@ -12,6 +12,7 @@
 #include "SP804.h"
 
 
+#include "hash/hash.h"
 #include "sched/task.h"
 #include "sched/prio_array.h"
 
@@ -23,6 +24,7 @@ typedef struct runqueue {
     task_t * idle;
     pid_t upid;
     int elapsed_time;
+    //pid_table_t pid_table;
     prio_array_t * active;
     prio_array_t * expired;
     prio_array_t arrays[2]; 

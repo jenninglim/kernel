@@ -19,6 +19,8 @@ extern void     main_P4();
 extern void     main_P5();
 
 void hilevel_handler_rst(ctx_t* ctx) {
+
+    // Initialised runqueue.
     init_rq(&rq);
     
     /* Configure the mechanism for interrupt handling by
@@ -49,19 +51,12 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
-    //rq_add_new_task(&rq, ( uint32_t )( &main_P5 ) );
-    
-    //rq_add_new_task(&rq, ( uint32_t )( &main_P3 ) );
     rq_add_console(&rq);
-    //rq_add_new_task(&rq, ( uint32_t )( &main_P4 ) );
-    
-    
 
     sched_rq(&rq, ctx);
     dispatch(rq.current, ctx);
-    
 
-        /* Once the PCBs are initialised, we (arbitrarily) select one to be
+    /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
      */
     
@@ -79,10 +74,11 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     if( id == GIC_SOURCE_TIMER0 ) {
         PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
+
+        //Timeslice passed
         time_passed(&rq);
         sched_rq(&rq, ctx);
         dispatch(rq.current,ctx);
-        //Switch process
     }
     
     // Step 5: write the interrupt identifier to signal we're done.
@@ -120,22 +116,20 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x03 : { // 0x03 => fork()
-            //TODO
-            //Create a new PCB for child
             task_t * child = rq_add_clone(&rq, ctx);
             ctx->gpr[0] = child->pid;
             child->ctx.gpr[0] = 0;
             break;
-            //Copy parent
-            //Set child processs stack space
-            //new pid
-            //gpr[0] for parent
-            //gpr[0] for child is 0
+        }
+        case 0x04 : { // 0x04 => exit()
         }
         case 0x05 : { // 0x05 => exec( pc )
-            //rq.current->ctx.pc = ctx->gpr[0];
             ctx->pc = ctx->gpr[0];
             break;
+        }
+        case 0x06 : { // 0x06 => set_prio( prio )
+
+           break; 
         }
         default   : { // 0x?? => unknown/unsupported
 
