@@ -24,22 +24,33 @@ void scheduler( ctx_t* ctx, list_head * head ) {
     return;
 }
 
+void time_passed(runqueue_t * rq) {
+    rq->elapsed_time = rq->elapsed_time + 1;
+    if (rq->elapsed_time - 1 == rq->current->prio) {
+        current_expired(rq);
+        rq->elapsed_time = 0;
+    }
+}
+
 bool sched_prio(task_t ** current, prio_array_t * array) {
     list_head * node;
     list_head * head;
     for (int i = 0; i < MAX_PRIO; i++) {
         head = &array->queue[i];
         list_for_each(node, head) {
-            *current = task_current_entry(node);
-            list_move_to_end(node, head);
+            * current = task_current_entry(node);
+            //list_move_to_end(node, head);
             return true;
         }
     }
-    free(node);
     return false;
 }
 
 void sched_rq(runqueue_t * rq) {
-    sched_prio(&rq->current, &rq->arrays[0]);
+    if (sched_prio(&rq->current, rq->active) == false) {
+        reallocate_time(rq);
+        sched_rq(rq);
+        //PL011_putc( UART0, 'F', true );
+    }
     return;
 }

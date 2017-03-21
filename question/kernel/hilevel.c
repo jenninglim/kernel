@@ -77,6 +77,7 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     if( id == GIC_SOURCE_TIMER0 ) {
         PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
+        time_passed(&rq);
         sched_rq(&rq);
         dispatch(rq.current,ctx);
         //Switch process
@@ -119,6 +120,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         case 0x03 : { // 0x03 => fork()
             //TODO
             //Create a new PCB for child
+            task_t * child = malloc(sizeof(task_t));
+            
             //Copy parent
             //Set child processs stack space
             //new pid

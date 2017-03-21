@@ -42,4 +42,6 @@ bool sched_prio(task_t ** current, prio_array_t * array);
 
 void sched_rq(runqueue_t * rq);
 
+void time_passed(runqueue_t * rq);
+
 #endif

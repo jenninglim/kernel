@@ -5,12 +5,20 @@
 #include <stddef.h>
 #include <string.h>
 
+// Include functionality relating to the platform.
+
+#include   "GIC.h"
+#include "PL011.h"
+#include "SP804.h"
+
+
 #include "sched/task.h"
 #include "sched/prio_array.h"
 
 typedef struct runqueue {
     task_t * current;
     task_t * idle;
+    int elapsed_time;
     prio_array_t * active;
     prio_array_t * expired;
     prio_array_t arrays[2]; 
@@ -44,7 +52,7 @@ void current_expired(runqueue_t * rq);
  * No more active tasks.
  */
 
-void reallocated_time(runqueue_t * rq);
+void reallocate_time(runqueue_t * rq);
 
 /*
  *
