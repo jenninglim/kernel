@@ -1,7 +1,7 @@
 # part 1: variables
 
  CONSOLE_HOST     = 127.0.0.1
- CONSOLE_PORT     = 1235
+ CONSOLE_PORT     = 1236
 
 # part 3: targets
 

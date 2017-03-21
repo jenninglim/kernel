@@ -39,18 +39,17 @@ bool sched_prio(task_t ** current, prio_array_t * array) {
         head = &array->queue[i];
         list_for_each(node, head) {
             * current = task_current_entry(node);
-            //list_move_to_end(node, head);
             return true;
         }
     }
     return false;
 }
 
-void sched_rq(runqueue_t * rq) {
+void sched_rq(runqueue_t * rq, ctx_t * ctx) {
+    update_ctx(&rq->current->ctx, ctx);
     if (sched_prio(&rq->current, rq->active) == false) {
         reallocate_time(rq);
-        sched_rq(rq);
-        //PL011_putc( UART0, 'F', true );
+        sched_rq(rq, ctx);
     }
     return;
 }

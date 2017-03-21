@@ -55,7 +55,9 @@ void hilevel_handler_rst(ctx_t* ctx) {
     
     rq_add_new_task(&rq, 3, ( uint32_t )( &main_P4 ), ( uint32_t )( 0x00010000 ));
     
-    sched_rq(&rq);
+    rq_add_new_task(&rq, 1, ( uint32_t )( &main_console ), ( uint32_t )( tos_console ));
+
+    sched_rq(&rq, ctx);
     dispatch(rq.current, ctx);
     
 
@@ -78,7 +80,7 @@ void hilevel_handler_irq( ctx_t* ctx) {
     if( id == GIC_SOURCE_TIMER0 ) {
         PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
         time_passed(&rq);
-        sched_rq(&rq);
+        sched_rq(&rq, ctx);
         dispatch(rq.current,ctx);
         //Switch process
     }
@@ -101,7 +103,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     
     switch( id ) {
         case 0x00 : { // 0x00 => yield()
-            sched_rq(&rq);
+            sched_rq(&rq, ctx);
             dispatch(rq.current, ctx);
             break;
         }

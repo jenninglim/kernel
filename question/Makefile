@@ -10,7 +10,7 @@
  QEMU_GDB         =        127.0.0.1:1234
  QEMU_UART        = stdio
 #QEMU_UART       += telnet:127.0.0.1:1235,server
-#QEMU_UART       += telnet:127.0.0.1:1236,server
+ QEMU_UART       += telnet:127.0.0.1:1236,server
 
  GCC_PATH      = ../gcc-arm-none-eabi-5_2-2015q4
  GCC_PREFIX    = arm-none-eabi
@@ -47,3 +47,6 @@ kill-gdb    :
 
 clean       : kill-qemu kill-gdb
 	@rm -f core ${PROJECT_OBJECTS} ${PROJECT_TARGETS}
+
+include Makefile.console
+include Makefile.disk

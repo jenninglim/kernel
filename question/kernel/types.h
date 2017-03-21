@@ -3,6 +3,12 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+
 
 /* The kernel source code is made simpler via three type definitions:
  *
@@ -22,6 +28,7 @@ typedef struct {
 
 void INIT_CTX(ctx_t * ctx, uint32_t cpsr, uint32_t pc, uint32_t sp);
 
+void update_ctx(ctx_t * new, ctx_t * source);
 
 #endif
 
