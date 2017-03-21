@@ -52,10 +52,10 @@ void hilevel_handler_rst(ctx_t* ctx) {
     rq_add_new_task(&rq, ( uint32_t )( &main_P5 ) );
     
     rq_add_new_task(&rq, ( uint32_t )( &main_P3 ) );
-    
+    rq_add_console(&rq);
     rq_add_new_task(&rq, ( uint32_t )( &main_P4 ) );
     
-    rq_add_new_task(&rq, ( uint32_t )( &main_console ) );
+    
 
     sched_rq(&rq, ctx);
     dispatch(rq.current, ctx);

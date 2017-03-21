@@ -3,13 +3,11 @@
  * For manipulation of tasks.
  */
 
-extern uint32_t tos_usr;
-
-void TASK_INIT(task_t * new_task, pid_t pid, uint32_t pc, uint32_t offset) {
+void TASK_INIT(task_t * new_task, uint32_t pc, uint32_t sp) {
     ctx_t new_ctx = {
         .cpsr = 0x50,
         .pc = pc,
-        .sp = (uint32_t) (&tos_usr + offset)
+        .sp = sp
     };
     new_task->state = 0;
     INIT_LIST_HEAD(&new_task->node);
@@ -17,9 +15,9 @@ void TASK_INIT(task_t * new_task, pid_t pid, uint32_t pc, uint32_t offset) {
     new_task->ctx = new_ctx;
 }
 
-void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t offset) {
+void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t sp) {
     update_ctx(&task->ctx, ctx);
-    task->ctx.sp = &tos_usr + offset;
+    task->ctx.sp = sp;
     task->pid = pid;
 }
 

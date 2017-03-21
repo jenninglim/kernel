@@ -15,6 +15,9 @@
 #include "sched/task.h"
 #include "sched/prio_array.h"
 
+extern void main_console();
+extern uint32_t tos_console;
+
 typedef struct runqueue {
     task_t * current;
     task_t * idle;
@@ -60,6 +63,8 @@ void reallocate_time(runqueue_t * rq);
  */
 
 void rq_add_new_task(runqueue_t * rq, uint32_t pc);
+
+void rq_add_console(runqueue_t * rq);
 
 /*
  * Run idle process

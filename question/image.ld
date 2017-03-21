@@ -23,7 +23,7 @@ SECTIONS {
   .       = . + 0x00001000;  
   tos_svc = .;
   /* allocate stack for user mode */
-  . = . + 0x01000000;
+  . = . + 0x00100000;
   tos_usr = .;
   /* allocate stack for console */
   . = . + 0x00010000;

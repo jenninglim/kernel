@@ -25,9 +25,9 @@ typedef struct {
     list_head node;
 } task_t;
 
-void TASK_INIT(task_t * new_task, pid_t pid, uint32_t pc, uint32_t offset);
+void TASK_INIT(task_t * new_task, uint32_t pc, uint32_t offset);
 
-void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t offset);
+//void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t offset);
 
 void set_task_state(task_t * task, int state);
 

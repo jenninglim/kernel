@@ -1,5 +1,7 @@
 #include "runqueue.h"
 
+extern uint32_t tos_usr;
+
 void init_rq(runqueue_t * rq) {
     rq->current = malloc(sizeof(task_t));
     rq->idle = malloc(sizeof(task_t));
@@ -38,8 +40,20 @@ void rq_add_new_task(runqueue_t * rq, uint32_t pc) {
     int32_t upid = rq->upid;
     rq->upid = rq->upid + 1;
     
-    int32_t offset = upid * 0x00010000;
-    TASK_INIT(task, upid, pc, offset);
+    int32_t offset = upid * 0x00100000;
+    TASK_INIT(task, upid, pc, &tos_usr + offset);
+    
+    add_to_active(task, rq);
+    return;
+}
+
+void rq_add_console(runqueue_t * rq) {
+    task_t * task = malloc(sizeof(task_t));
+
+    int32_t upid = rq->upid;
+    rq->upid = rq->upid + 1;
+    
+    TASK_INIT(task, upid, (uint32_t) (&main_console), (uint32_t) (&tos_console));
     
     add_to_active(task, rq);
     return;
