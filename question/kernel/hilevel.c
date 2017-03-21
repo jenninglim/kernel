@@ -49,13 +49,13 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
-    rq_add_new_task(&rq, 4, ( uint32_t )( &main_P5 ), ( uint32_t )( 0x00000000 ));
+    rq_add_new_task(&rq, ( uint32_t )( &main_P5 ) );
     
-    rq_add_new_task(&rq, 2, ( uint32_t )( &main_P3 ), ( uint32_t )( 0x00001000 ));
+    rq_add_new_task(&rq, ( uint32_t )( &main_P3 ) );
     
-    rq_add_new_task(&rq, 3, ( uint32_t )( &main_P4 ), ( uint32_t )( 0x00010000 ));
+    rq_add_new_task(&rq, ( uint32_t )( &main_P4 ) );
     
-    rq_add_new_task(&rq, 1, ( uint32_t )( &main_console ), ( uint32_t )( tos_console ));
+    rq_add_new_task(&rq, ( uint32_t )( &main_console ) );
 
     sched_rq(&rq, ctx);
     dispatch(rq.current, ctx);
@@ -121,9 +121,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         case 0x03 : { // 0x03 => fork()
             //TODO
+            int new_loc = 0;
             //Create a new PCB for child
             task_t * child = malloc(sizeof(task_t));
-            
             //Copy parent
             //Set child processs stack space
             //new pid

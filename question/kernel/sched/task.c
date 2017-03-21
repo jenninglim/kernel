@@ -17,6 +17,12 @@ void TASK_INIT(task_t * new_task, pid_t pid, uint32_t pc, uint32_t offset) {
     new_task->ctx = new_ctx;
 }
 
+void task_clone(task_t * task, pid_t pid, ctx_t * ctx, uint32_t offset) {
+    update_ctx(&task->ctx, ctx);
+    task->ctx.sp = &tos_usr + offset;
+    task->pid = pid;
+}
+
 void set_task_state(task_t * task, int state) {
     task->state = state;
     return;

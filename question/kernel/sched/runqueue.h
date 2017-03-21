@@ -18,6 +18,7 @@
 typedef struct runqueue {
     task_t * current;
     task_t * idle;
+    int32_t upid;
     int elapsed_time;
     prio_array_t * active;
     prio_array_t * expired;
@@ -58,7 +59,7 @@ void reallocate_time(runqueue_t * rq);
  *
  */
 
-void rq_add_new_task(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t offset);
+void rq_add_new_task(runqueue_t * rq, uint32_t pc);
 
 /*
  * Run idle process

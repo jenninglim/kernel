@@ -4,6 +4,7 @@ void init_rq(runqueue_t * rq) {
     rq->current = malloc(sizeof(task_t));
     rq->idle = malloc(sizeof(task_t));
     rq->elapsed_time = 0;
+    rq->upid = 0;
 
     init_prio_array(&rq->arrays[1]);
     init_prio_array(&rq->arrays[0]);
@@ -31,10 +32,15 @@ void add_to_expired(task_t * task, runqueue_t * rq) {
     return;
 }
 
-
-void rq_add_new_task(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t offset) {
+void rq_add_new_task(runqueue_t * rq, uint32_t pc) {
     task_t * task = malloc(sizeof(task_t));
-    TASK_INIT(task, pid, pc, offset);
+
+    int32_t upid = rq->upid;
+    rq->upid = rq->upid + 1;
+    
+    int32_t offset = upid * 0x00010000;
+    TASK_INIT(task, upid, pc, offset);
+    
     add_to_active(task, rq);
     return;
 }
