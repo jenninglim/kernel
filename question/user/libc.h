@@ -34,6 +34,7 @@ typedef int pid_t;
 #define SYS_EXEC      ( 0x05 )
 #define SYS_KILL      ( 0x06 )
 #define SYS_PRIO      ( 0x07 )
+#define SYS_PID       ( 0x08 )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -70,5 +71,8 @@ extern int  kill( pid_t pid, int x );
 
 // perform prority change.
 extern void set_prio( int pid, int prio );
+
+// get pid
+extern int get_pid();
 
 #endif

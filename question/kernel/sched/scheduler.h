@@ -29,6 +29,8 @@ void undispatch(task_t * prev, ctx_t * ctx);
 
 void scheduler(ctx_t * ctx, list_head * head);
 
+void sched_update_ctx(runqueue_t * rq, ctx_t * ctx);
+
 /*
  * Sets * current to point to the current running task from the prio_array.
  * Returns true if sucessful, false otherwise.

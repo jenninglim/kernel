@@ -142,6 +142,17 @@ void set_prio( int pid, int prio  ) {
   return;
 }
 
+int get_pid() {
+  int r;
+  asm volatile( "svc %1 \n" // assign r0 =  pid
+                "mov %0, r0 \n" // assign r1 = prio
+              : "=r" (r)
+              : "I" (SYS_PID)
+              : "r0" );
+
+  return r;
+}
+
 register char * stack_ptr asm ("sp");
 
 /* Heap limit returned from SYS_HEAPINFO Angel semihost call.  */

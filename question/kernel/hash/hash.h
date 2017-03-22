@@ -28,7 +28,7 @@ void HASH_INIT (pid_table_t * table);
 
 int hash_PID(pid_t pid);
 
-task_t * find_task_PID(pid_table_t * table, pid_t pid);
+task_t * find_task_pid(pid_table_t * table, pid_t pid);
 
 void add_hash_entry(pid_table_t * table, task_t * entry);
 

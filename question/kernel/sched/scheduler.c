@@ -45,11 +45,18 @@ bool sched_prio(task_t ** current, prio_array_t * array) {
     return false;
 }
 
-void sched_rq(runqueue_t * rq, ctx_t * ctx) {
+void sched_update_ctx(runqueue_t * rq, ctx_t * ctx) {
     update_ctx(&rq->current->ctx, ctx);
+}
+
+void sched_rq(runqueue_t * rq, ctx_t * ctx) {
+    //update_ctx(&rq->current->ctx, ctx);
     if (sched_prio(&rq->current, rq->active) == false) {
         reallocate_time(rq);
         sched_rq(rq, ctx);
+    }
+    else {
+        dispatch(rq->current, ctx);
     }
     return;
 }

@@ -3,7 +3,7 @@
 extern uint32_t tos_usr;
 
 void init_rq(runqueue_t * rq) {
-    rq->current = malloc(sizeof(task_t));
+    rq->current = NULL;
     rq->idle = malloc(sizeof(task_t));
     
     HASH_INIT(&rq->pid_table);
@@ -38,25 +38,26 @@ void add_to_expired(task_t * task, runqueue_t * rq) {
 
 task_t * rq_add(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t sp) {
     task_t * task = malloc(sizeof(task_t));
-    add_hash_entry(&rq->pid_table, task);
     TASK_INIT(task, pc, sp);
     set_task_pid(task, pid); 
     add_to_active(task, rq);
+    add_hash_entry(&rq->pid_table, task);
     return task;
 }
 
 task_t * rq_find_task_pid(runqueue_t * rq, pid_t pid) {
-    return find_task_PID(&rq->pid_table, pid);
+    return find_task_pid(&rq->pid_table, pid);
 }
 
 task_t * rq_remove_task(runqueue_t * rq, pid_t pid) {
     task_t * task = rq_find_task_pid(rq,pid); 
+    //remove_hash_entry(&rq->pid_table, rq->current->pid);
     list_del(&task->node);
+    return task;
 }
 
 void * rq_task_prio_change(runqueue_t * rq, pid_t pid, int prio) {
-    task_t * task = rq_find_task_pid(rq, pid);
-    rq_remove_task(rq, pid);
+    task_t * task = rq_remove_task(rq, pid);
     set_task_prio(task, prio);
     add_to_active(task, rq);
 }
@@ -72,7 +73,8 @@ task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc) {
 }
 
 task_t * rq_add_console(runqueue_t * rq) {
-    return rq_add(rq, new_pid(rq), (uint32_t) (&main_console), (uint32_t) (&tos_console));
+    pid_t npid = new_pid(rq);
+    return rq_add(rq, npid, (uint32_t) (&main_console), (uint32_t) (&tos_console));
 }
 
 task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx) {

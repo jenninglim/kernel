@@ -54,7 +54,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
     rq_add_console(&rq);
 
     sched_rq(&rq, ctx);
-    dispatch(rq.current, ctx);
 
     /* Once the PCBs are initialised, we (arbitrarily) select one to be
      * restored (i.e., executed) when the function then returns.
@@ -77,8 +76,8 @@ void hilevel_handler_irq( ctx_t* ctx) {
 
         //Timeslice passed
         time_passed(&rq);
+        sched_update_ctx(&rq, ctx);
         sched_rq(&rq, ctx);
-        dispatch(rq.current,ctx);
     }
     
     // Step 5: write the interrupt identifier to signal we're done.
@@ -99,8 +98,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     
     switch( id ) {
         case 0x00 : { // 0x00 => yield()
+            sched_update_ctx(&rq, ctx);
             sched_rq(&rq, ctx);
-            dispatch(rq.current, ctx);
             break;
         }
         case 0x01 : { // 0x01 => write( fd, x, n )
@@ -122,12 +121,16 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x04 : { // 0x04 => exit()
+            task_t * removed = rq_remove_task(&rq, rq.current->pid);
+            free(removed);
+            sched_rq(&rq, ctx);
+            break;
         }
         case 0x05 : { // 0x05 => exec( pc )
             ctx->pc = ctx->gpr[0];
             break;
         }
-        case 0x06 : { // 0x06 => set_prio( pid, prio )
+        case 0x07 : { // 0x06 => set_prio( pid, prio )
             pid_t pid = (pid_t) ctx->gpr[0];
             int prio = ctx->gpr[1];
             rq_task_prio_change(&rq, pid, prio); 
