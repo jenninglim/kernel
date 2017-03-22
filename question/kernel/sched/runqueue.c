@@ -51,14 +51,15 @@ task_t * rq_find_task_pid(runqueue_t * rq, pid_t pid) {
 
 task_t * rq_remove_task(runqueue_t * rq, pid_t pid) {
     task_t * task = rq_find_task_pid(rq,pid); 
-    //remove_hash_entry(&rq->pid_table, rq->current->pid);
+    remove_hash_entry(&rq->pid_table, rq->current->pid);
     list_del(&task->node);
     return task;
 }
 
 void * rq_task_prio_change(runqueue_t * rq, pid_t pid, int prio) {
-    task_t * task = rq_remove_task(rq, pid);
+    task_t * task = rq_find_task_pid(rq, pid);
     set_task_prio(task, prio);
+    list_del(&task->node);
     add_to_active(task, rq);
 }
 

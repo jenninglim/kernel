@@ -26,7 +26,7 @@ void scheduler( ctx_t* ctx, list_head * head ) {
 
 void time_passed(runqueue_t * rq) {
     rq->elapsed_time = rq->elapsed_time + 1;
-    if (rq->elapsed_time - 1 == rq->current->prio) {
+    if (rq->elapsed_time - 1 > rq->current->prio) {
         current_expired(rq);
         rq->elapsed_time = 0;
     }
