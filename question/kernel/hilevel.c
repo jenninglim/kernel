@@ -127,9 +127,11 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             ctx->pc = ctx->gpr[0];
             break;
         }
-        case 0x06 : { // 0x06 => set_prio( prio )
-
-           break; 
+        case 0x06 : { // 0x06 => set_prio( pid, prio )
+            pid_t pid = (pid_t) ctx->gpr[0];
+            int prio = ctx->gpr[1];
+            rq_task_prio_change(&rq, pid, prio); 
+            break; 
         }
         default   : { // 0x?? => unknown/unsupported
 

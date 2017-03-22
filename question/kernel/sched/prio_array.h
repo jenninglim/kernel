@@ -1,7 +1,7 @@
 #ifndef __PRIO_ARRAY_H
 #define __PRIO_ARRAY_H
 
-#define MAX_PRIO 1
+#define MAX_PRIO 10
 
 #include <stdbool.h>
 #include <stddef.h>

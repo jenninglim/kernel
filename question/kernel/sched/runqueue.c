@@ -45,6 +45,22 @@ task_t * rq_add(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t sp) {
     return task;
 }
 
+task_t * rq_find_task_pid(runqueue_t * rq, pid_t pid) {
+    return find_task_PID(&rq->pid_table, pid);
+}
+
+task_t * rq_remove_task(runqueue_t * rq, pid_t pid) {
+    task_t * task = rq_find_task_pid(rq,pid); 
+    list_del(&task->node);
+}
+
+void * rq_task_prio_change(runqueue_t * rq, pid_t pid, int prio) {
+    task_t * task = rq_find_task_pid(rq, pid);
+    rq_remove_task(rq, pid);
+    set_task_prio(task, prio);
+    add_to_active(task, rq);
+}
+
 pid_t new_pid(runqueue_t * rq) {
     rq->upid++;
     return rq->upid - 1;

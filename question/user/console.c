@@ -76,6 +76,12 @@ void main_console() {
 
       kill( pid, s );
     } 
+    else if (0 == strcmp( p, "set_prio")) {
+        int pid = atoi(strtok( NULL, " ") );
+        int prio = atoi(strtok( NULL, " ") );
+
+        set_prio(pid, prio);
+    }
     else {
       puts( "unknown command\n", 16 );
     }

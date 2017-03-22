@@ -69,6 +69,6 @@ extern void exec( const void* x );
 extern int  kill( pid_t pid, int x );
 
 // perform prority change.
-extern void set_prio( pid_t pid );
+extern void set_prio( int pid, int prio );
 
 #endif

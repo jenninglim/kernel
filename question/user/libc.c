@@ -130,13 +130,14 @@ int kill( int pid, int x ) {
   return r;
 }
 
-void set_prio( pid_t prio ) {
+void set_prio( int pid, int prio  ) {
 
   asm volatile( "mov r0, %1 \n" // assign r0 =  pid
+                "mov r1, %2 \n" // assign r1 = prio
                 "svc %0     \n" // make system call SYS_KILL
               : 
-              : "I" (SYS_PRIO), "r" (prio)
-              : "r0" );
+              : "I" (SYS_PRIO), "r" (pid), "r" (prio)
+              : "r0" , "r1" );
 
   return;
 }

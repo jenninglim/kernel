@@ -24,7 +24,7 @@ typedef struct runqueue {
     task_t * idle;
     pid_t upid;
     int elapsed_time;
-    //pid_table_t pid_table;
+    pid_table_t pid_table;
     prio_array_t * active;
     prio_array_t * expired;
     prio_array_t arrays[2]; 
@@ -69,6 +69,10 @@ task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx);
 task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc);
 
 task_t * rq_add_console(runqueue_t * rq);
+
+task_t * rq_find_task_pid(runqueue_t * rq, pid_t pid);
+
+void * rq_task_prio_change(runqueue_t * rq, pid_t pid, int prio);
 
 /*
  * Run idle process
