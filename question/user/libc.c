@@ -131,14 +131,12 @@ int kill( int pid, int x ) {
 }
 
 void set_prio( int pid, int prio  ) {
-
   asm volatile( "mov r0, %1 \n" // assign r0 =  pid
                 "mov r1, %2 \n" // assign r1 = prio
                 "svc %0     \n" // make system call SYS_KILL
               : 
               : "I" (SYS_PRIO), "r" (pid), "r" (prio)
               : "r0" , "r1" );
-
   return;
 }
 
@@ -149,8 +147,47 @@ int get_pid() {
               : "=r" (r)
               : "I" (SYS_PID)
               : "r0" );
-
   return r;
+}
+
+int * sem_open () {
+    int * r;
+    asm volatile( "svc %1 \n"
+                  "mov %0, r0 \n"
+                  : "=r" (r)
+                  : "I" (SYS_SEMOP)
+                  : "r0");
+    return r;
+}
+
+void sem_post(int * sem) {
+    asm volatile( "ldrex r1, [%0] \n"
+                  "add r1, r1, #1 \n"
+                  "strex r2, r1, [%0] \n"
+                  "cmp r2, #0 \n"
+                  "bne sem_post \n"
+                  "dmb \n"
+                  "bx lr \n"
+                : 
+                : "r" (sem)
+                : "r1", "r2");
+    return;
+}
+
+void sem_wait(int * sem) {
+    asm volatile( "ldrex r1, [%0] \n"
+                  "cmp r1, #0 \n"
+                  "beq sem_wait \n"
+                  "sub r1, r1, #1 \n"
+                  "strex r2, r1, [%0] \n"
+                  "cmp r2, #0 \n"
+                  "bne sem_wait \n"
+                  "dmb \n"
+                  "bx lr \n"
+                : 
+                : "r" (sem)
+                : "r1", "r2");
+    return;
 }
 
 register char * stack_ptr asm ("sp");
