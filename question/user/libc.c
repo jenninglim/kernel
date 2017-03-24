@@ -150,14 +150,28 @@ int get_pid() {
   return r;
 }
 
-int * sem_open () {
+int * sem_open (int value) {
     int * r;
-    asm volatile( "svc %1 \n"
+    asm volatile( "mov r0, %2 \n"
+                  "svc %1 \n"
                   "mov %0, r0 \n"
                   : "=r" (r)
-                  : "I" (SYS_SEMOP)
+                  : "I" (SYS_SEM_OPEN), "r" (value)
                   : "r0");
     return r;
+}
+
+void * shm_open ( void * data, int size ) {
+    int * r;
+    asm volatile( "mov r0, %2 \n"
+                  "mov r1, %3 \n"
+                  "svc %1 \n"
+                  "mov %0, r0 \n"
+                  : "=r" (r)
+                  : "I" (SYS_SHMEM_OPEN), "r" (data), "r" (size)
+                  : "r0");
+    return r;
+
 }
 
 void sem_post(int * sem) {
@@ -167,7 +181,6 @@ void sem_post(int * sem) {
                   "cmp r2, #0 \n"
                   "bne sem_post \n"
                   "dmb \n"
-                  "bx lr \n"
                 : 
                 : "r" (sem)
                 : "r1", "r2");
@@ -183,7 +196,6 @@ void sem_wait(int * sem) {
                   "cmp r2, #0 \n"
                   "bne sem_wait \n"
                   "dmb \n"
-                  "bx lr \n"
                 : 
                 : "r" (sem)
                 : "r1", "r2");

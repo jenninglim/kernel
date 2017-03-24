@@ -11,6 +11,7 @@
 #include "PL011.h"
 #include "SP804.h"
 
+#define STACKSPACE 0x00100000
 
 #include "hash/hash.h"
 #include "sched/task.h"

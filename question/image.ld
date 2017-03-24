@@ -25,6 +25,8 @@ SECTIONS {
   /* allocate stack for user mode */
   . = . + 0x01000000;
   tos_usr = .;
+  . = . + 0x00100000;
+  tos_shared = .;
   /* allocate stack for console */
   . = . + 0x00010000;
   tos_console = .;

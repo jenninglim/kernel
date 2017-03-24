@@ -20,7 +20,7 @@
 %.o   : %.s
 	@${GCC_PATH}/bin/${GCC_PREFIX}-as  $(addprefix -I , ${PROJECT_PATH} ${GCC_PATH}/arm-eabi/include) -mcpu=cortex-a8                                       -g       -o ${@} ${<}
 %.o   : %.c
-	@${GCC_PATH}/bin/${GCC_PREFIX}-gcc $(addprefix -I , ${PROJECT_PATH} ${GCC_PATH}/arm-eabi/include) -mcpu=cortex-a8 -mabi=aapcs -ffreestanding -std=gnu99 -g -c -O -o ${@} ${<}
+	@${GCC_PATH}/bin/${GCC_PREFIX}-gcc $(addprefix -I , ${PROJECT_PATH} ${GCC_PATH}/arm-eabi/include) -mcpu=cortex-a8 -mabi=aapcs -ffreestanding -std=gnu99 -g -c -o ${@} ${<}
 
 %.elf : ${PROJECT_OBJECTS}
 	@${GCC_PATH}/bin/${GCC_PREFIX}-ld  $(addprefix -L , ${GCC_PATH}/lib/gcc/arm-none-eabi/5.2.1) $(addprefix -L , ${GCC_PATH}/arm-none-eabi/lib) -T ${*}.ld -o ${@} ${^} -lc -lgcc

@@ -11,8 +11,11 @@
  */
 
 runqueue_t rq;
+semtable_t semtable;
+int32_t * sharedmem;
 
 extern void     main_console();
+extern uint32_t tos_shared;
 extern uint32_t tos_console;
 extern void     main_P3();
 extern void     main_P4();
@@ -22,6 +25,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
     // Initialised runqueue.
     init_rq(&rq);
+    sharedmem = &tos_shared;
     
     /* Configure the mechanism for interrupt handling by
      *
@@ -118,6 +122,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             task_t * child = rq_add_clone(&rq, ctx);
             ctx->gpr[0] = child->pid;
             child->ctx.gpr[0] = 0;
+
+            //Copy stack
             break;
         }
         case 0x04 : { // 0x04 => exit()
@@ -136,9 +142,16 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             rq_task_prio_change(&rq, pid, prio); 
             break; 
         }
-        case 0x09 : { // 0x09 => sem_open ()
+        case 0x09 : { // 0x09 => SEM_OPEN ()
+            ctx->gpr[0] = (int) add_sem(&semtable, ctx->gpr[0]);
             break;
         }
+        case 0x0A : { // 0x0A => SHEM_OPEN ();
+            ctx->gpr[0] = (int) memcpy(sharedmem, (void * ) ctx->gpr[0], ctx->gpr[1]);
+            //TODO :: SHARED MEMORY OFFSET
+            break;
+        }
+
 
         default   : { // 0x?? => unknown/unsupported
 

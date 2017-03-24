@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <errno.h>
 
+#include <unistd.h>
+
 // Define a type that that captures a Process IDentifier (PID).
 
 typedef int pid_t;
@@ -33,19 +35,19 @@ typedef int pid_t;
 #define SYS_EXIT      ( 0x04 )
 #define SYS_EXEC      ( 0x05 )
 #define SYS_KILL      ( 0x06 )
-#define SYS_PRIO      ( 0x07 )
-#define SYS_PID       ( 0x08 )
-#define SYS_SEMOP     ( 0x09 )
+#define SYS_PRIO           ( 0x07 )
+#define SYS_PID            ( 0x08 )
+#define SYS_SEM_OPEN          ( 0x09 )
+#define SYS_SHMEM_OPEN     ( 0x0A ) // Initialise Shared Memory
+#define SYS_SHMEM_CLOSE    ( 0x0B )
+#define SYS_SHMEM_READ     ( 0x0C )
+#define SYS_SHMEM_WRITE    ( 0x0D )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
 
 #define EXIT_SUCCESS  ( 0 )
 #define EXIT_FAILURE  ( 1 )
-
-#define  STDIN_FILENO ( 0 )
-#define STDOUT_FILENO ( 1 )
-#define STDERR_FILENO ( 2 )
 
 // convert ASCII string x into integer r
 extern int  atoi( char* x        );
@@ -76,9 +78,21 @@ extern void set_prio( int pid, int prio );
 // get pid
 extern int get_pid();
 
+//opennn
+extern int * sem_open( int value);
+
 // increament a semaphore.
 extern void sem_post(int * sem);
 
-extern int * sem_open();
+extern void sem_wait(int * sem);
+
+// open shared memory.
+extern void * shm_open( void * data, int size );
+
+extern int sem_write(int sema_id, void * data);
+
+extern char * sem_read( int sema_id);
+
+
 
 #endif

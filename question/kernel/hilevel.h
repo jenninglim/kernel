@@ -20,6 +20,7 @@
 #include "lolevel.h"
 #include     "int.h"
 #include "sched/scheduler.h"
+#include "sema/sema.h"
 
 /* The kernel source code is made simpler via three type definitions:
  *
