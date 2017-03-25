@@ -9,7 +9,7 @@
 
 #include "libc.h"
 
-#define NO_OF_PHILOSOPHERS 5
+#define NO_OF_PHILOSOPHERS 16
 
 #define EATING 1
 #define THINKING 0

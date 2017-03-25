@@ -37,7 +37,8 @@ void printInt(int id, state_e state) {
 
 void printState(state_e *stateTable) {
     write( STDOUT_FILENO, "\n", 2);
-    for (int i = 0; i < NO_OF_PHILOSOPHERS) {
+    for (int i = 0; i < NO_OF_PHILOSOPHERS; i++) {
+
 
     }
     return;
@@ -63,7 +64,7 @@ void test(int id, state_e * stateTable,int ** semaphore) {
 void think() {
     int i = 0;
     while (i < 10000) {
-        for (int j = 0; j < 100; j ++ ) {
+        for (int j = 0; j < 300; j ++ ) {
             isPrime(i);
         }
         i++;
@@ -72,8 +73,6 @@ void think() {
 
 void philosophers(int id,int * me, state_e * statetable, int * semtable[]) {
     while (1) {
-        //printInt(id + 1);
-
         switch (statetable[id]) {
             case E:
                 printInt((int) (id + 1), statetable[id]);
@@ -85,12 +84,13 @@ void philosophers(int id,int * me, state_e * statetable, int * semtable[]) {
                 sem_post(me);
                 break;
             case T:
-                printInt((int) (id + 1), statetable[id]);
+                //printInt((int) (id + 1), statetable[id]);
+                think();
                 sem_wait(me);
                 statetable[id] = H;
                 break;
             case H:
-                printInt((int) (id + 1), statetable[id]);
+                //printInt((int) (id + 1), statetable[id]);
                 test(id, statetable, semtable);
                 sem_post(me);
                 sem_wait(&(* semtable) [id]);
