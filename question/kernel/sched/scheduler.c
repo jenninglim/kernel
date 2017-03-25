@@ -39,6 +39,8 @@ bool sched_prio(task_t ** current, prio_array_t * array) {
         head = &array->queue[i];
         list_for_each(node, head) {
             * current = task_current_entry(node);
+            list_del(node);
+            list_add_tail(node, head);
             return true;
         }
     }
