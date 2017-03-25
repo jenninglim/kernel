@@ -83,7 +83,7 @@ task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx) {
     task_t * clone = rq_add(rq, npid, ctx->pc, ctx->sp);
     int32_t offset = (uint32_t) &tos_usr - rq->current->pid * STACKSPACE - ctx->sp;
     task_clone(clone, ctx, (uint32_t) &tos_usr - npid * STACKSPACE - offset);
-    memcpy((&tos_usr) - (npid ) * STACKSPACE, (&tos_usr) - (rq->current->pid ) * STACKSPACE, STACKSPACE); 
+    memcpy((&tos_usr) - (npid - 1) * STACKSPACE, (&tos_usr) - (rq->current->pid - 1) * STACKSPACE, STACKSPACE); 
     return clone;
 }
 
