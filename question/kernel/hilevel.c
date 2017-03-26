@@ -10,8 +10,8 @@
  *   can be created, and neither is able to complete.
  */
 
-runqueue_t rq;
-semtable_t semtable;
+runqueue_t rq;         //For schedulling
+semtable_t semtable;   //For shared memory
 int32_t * sharedmem;
 
 extern void     main_console();
@@ -20,6 +20,14 @@ extern uint32_t tos_console;
 extern void     main_P3();
 extern void     main_P4();
 extern void     main_P5();
+
+void hilevel_handler_pab() {
+      return;
+}
+
+void hilevel_handler_dab() {
+      return;
+}
 
 void hilevel_handler_rst(ctx_t* ctx) {
 
