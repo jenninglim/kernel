@@ -84,8 +84,9 @@ void philosophers(int id,int * me, state_e * statetable, int * semtable[]) {
                 sem_post(me);
                 break;
             case T:
-                //printInt((int) (id + 1), statetable[id]);
-                think();
+                printInt((int) (id + 1), statetable[id]);
+                //think();
+                yield();
                 sem_wait(me);
                 statetable[id] = H;
                 break;

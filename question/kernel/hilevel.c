@@ -103,6 +103,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     switch( id ) {
         case 0x00 : { // 0x00 => yield()
             sched_update_ctx(&rq, ctx);
+            current_expired(&rq);
             sched_rq(&rq, ctx);
             break;
         }
