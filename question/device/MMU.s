@@ -25,7 +25,7 @@
 .global mmu_set_dom
 
 mmu_enable:          mrc   p15, 0, r0, c1, c0, 0 @ read  SCTLR
-                     orr   r0, #0x1          @ set   SCTLR[ M ] = 1 => MMU  enable
+                     orr   r0, r0, #0x1          @ set   SCTLR[ M ] = 1 => MMU  enable
                      mcr   p15, 0, r0, c1, c0, 0 @ write SCTLR
 
                      mov   pc, lr                @ return
