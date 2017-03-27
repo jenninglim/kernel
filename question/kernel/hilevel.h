@@ -21,7 +21,7 @@
 #include     "int.h"
 #include "sched/scheduler.h"
 #include "sema/sema.h"
-
-typedef uint32_t pte_t;
+#include "page/page.h"
+//#include "MMU.h"
 
 #endif

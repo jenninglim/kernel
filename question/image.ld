@@ -11,19 +11,22 @@ SECTIONS {
   .heap : {
       end = .;
       _heap_start = .;
-      . = . + 0x00001000 ;
+      . = . + 0x00100000 ;
       _heap_end = .;
   }
- /* align       address (per AAPCS) */
-  .       = ALIGN( 8 );        
+  /* align       address (per AAPCS) */
+  .       = ALIGN( 8 );
   /* allocate stack for irq mode     */
   .       = . + 0x00001000;  
   tos_irq = .;
   /* allocate stack for svc mode     */
   .       = . + 0x00001000;  
   tos_svc = .;
+  /* allocate stack for abt mode     */
+  .       = . + 0x00001000;
+  tos_abt = .;
   /* allocate stack for user mode */
-  . = . + 0x01000000;
+  . = . + 0x02000000;
   tos_usr = .;
   . = . + 0x00100000;
   tos_shared = .;

@@ -11,8 +11,8 @@
 int_data:            ldr   pc, int_addr_rst        @ reset                 vector -> SVC mode
                      b     .                       @ undefined instruction vector -> UND mode
                      ldr   pc, int_addr_svc        @ supervisor call       vector -> SVC mode
-                     ldr   pc, int_addr_dab        @ pre-fetch abort       vector -> ABT mode
-                     ldr   pc, int_addr_pab        @      data abort       vector -> ABT mode
+                     ldr   pc, int_addr_pab        @ pre-fetch abort       vector -> ABT mode
+                     ldr   pc, int_addr_dab        @      data abort       vector -> ABT mode
                      b     .                       @ reserved
                      ldr   pc, int_addr_irq        @ IRQ                   vector -> IRQ mode
                      b     .                       @ FIQ                   vector -> FIQ mode

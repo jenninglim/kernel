@@ -13,6 +13,8 @@
 runqueue_t rq;         //For schedulling
 semtable_t semtable;   //For shared memory
 int32_t * sharedmem;
+//pt_t pages __attribute__ ((aligned (1<<14)));
+uint32_t T[4096] __attribute__ ((aligned (1<<14)));
 
 extern void     main_console();
 extern uint32_t tos_shared;
@@ -30,11 +32,28 @@ void hilevel_handler_dab() {
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
-
-    // Initialised runqueue.
-    init_rq(&rq);
-    sharedmem = &tos_shared;
     
+    for( int i = 0; i < 4096; i++ ) {
+        T[ i ] = ( ( pte_t )( i ) << 20 ) | 0x00C02;
+    }
+    
+    mmu_set_ptr0( T );
+    
+    mmu_set_dom( 0, 0x3 ); // set domain 0 to 11_{(2)} => manager (i.e., not checked)
+    mmu_set_dom( 1, 0x1 ); // set domain 1 to 01_{(2)} => client  (i.e.,     checked)
+    
+    mmu_enable();
+     
+    
+    
+/*
+    kernel_page(T);
+    // Initialised runqueue.
+    enable_MMU(T);*/
+    init_rq(&rq);
+
+    // Initialise shared mem
+    sharedmem = &tos_shared;
     /* Configure the mechanism for interrupt handling by
      *
      * - configuring timer st. it raises a (periodic) interrupt for each

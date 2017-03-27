@@ -14,6 +14,9 @@ lolevel_handler_rst: bl    int_init                @ initialise interrupt vector
                      msr   cpsr, #0xD2             @ enter IRQ mode with IRQ and FIQ interrupts disabled
                      ldr   sp, =tos_irq            @ initialise IRQ mode stack
 
+                     msr   cpsr, #0xD7             @ enter ABT mode with IRQ and FIQ interrupts disabled
+                     ldr   sp, =tos_abt            @ initialise ABT mode stack
+
                      msr   cpsr, #0xD3             @ enter SVC mode with IRQ and FIQ interrupts disabled
                      ldr   sp, =tos_svc            @ initialise SVC mode stack
 
@@ -44,7 +47,6 @@ lolevel_handler_svc: sub   lr, lr, #0              @ correct return address
                      ldmia sp, { r0-r12, sp, lr }^ @ load USR mode register
                      add   sp, sp, #60             @ update SVC mode SP
                      movs  pc, lr                  @ Switches back to user mode
-
 
 lolevel_handler_irq: sub   lr, lr, #4              @ correct return address
                      sub   sp, sp, #60              @ update IRQ mode stack
