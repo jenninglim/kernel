@@ -32,7 +32,7 @@ void hilevel_handler_dab() {
 
 void hilevel_handler_rst(ctx_t* ctx) {
     
-    access_mem(T);
+    user_page(T, 1);
     enable_MMU(T); 
     
     

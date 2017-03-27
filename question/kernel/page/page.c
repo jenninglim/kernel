@@ -60,16 +60,18 @@ void access_mem(pte_t * pt) {
 
 void user_page(pte_t * pt, int page_no) {
     for (int i = 0; i < NR_PAGES; i ++) {
-        pt[i] = ((pte_t) (i) << 20) | 0x00000002;    
+        pt[i] = ((pte_t) (i) << 20) | 0x00000002;
         pt[i] &= DOMAIN_MASK;
-        pt[i] |= DOMAIN_CLIENT;
-        pt[i] &= ACCESS_MASK;
-        pt[i] |= AP_PRW_URO;
+        if (i >= 0 && i <= 300) {
+            pt[i] |= DOMAIN_MANAGER;
+        }
+        else if ( i >= 1826) {
+            pt[i] |= DOMAIN_MANAGER;
+        }
+        else {
+            pt[i] |= DOMAIN_CLIENT;
+            pt[i] &= ACCESS_MASK;
+            pt[i] |= AP_PRW_URO;
+        }
     }
-    pt[ 0x754 ] &= DOMAIN_MASK;
-    pt[ 0x754 ] |= DOMAIN_MANAGER;
-    pt[ 0x755 ] &= DOMAIN_MASK;
-    pt[ 0x755 ] |= DOMAIN_MANAGER;
-    pt[ 0x756 ] &= DOMAIN_MASK;
-    pt[ 0x756 ] |= DOMAIN_MANAGER;
 }
