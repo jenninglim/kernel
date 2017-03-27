@@ -81,9 +81,9 @@ task_t * rq_add_console(runqueue_t * rq) {
 task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx) {
     pid_t npid = new_pid(rq); 
     task_t * clone = rq_add(rq, npid, ctx->pc, ctx->sp);
-    int32_t offset = (uint32_t) &tos_usr - rq->current->pid * STACKSPACE - ctx->sp;
-    task_clone(clone, ctx, (uint32_t) &tos_usr - npid * STACKSPACE - offset);
-    memcpy((&tos_usr) - (npid - 1) * STACKSPACE, (&tos_usr) - (rq->current->pid - 1) * STACKSPACE, STACKSPACE); 
+    uint32_t offset = ((uint32_t) &tos_usr) - ((uint32_t) rq->current->pid * STACKSPACE) - ctx->sp;
+    task_clone(clone, ctx, ((uint32_t) &tos_usr) - npid * STACKSPACE - offset);
+    memcpy( (char *) ((uint32_t) &tos_usr) - (npid + 1) * STACKSPACE, (char *) ((uint32_t) &tos_usr) - (rq->current->pid + 1) * STACKSPACE, STACKSPACE); 
     return clone;
 }
 
