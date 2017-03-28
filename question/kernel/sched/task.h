@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "list/list.h"
+#include "page/page.h"
 
 /*
  * For manipulating tasks
@@ -23,6 +24,7 @@ typedef struct {
     pid_t pid;
     ctx_t ctx;
     list_head node;
+    pte_t T[4096] __attribute__ ((aligned (1 << 14)));
 } task_t;
 
 void TASK_INIT(task_t * new_task, uint32_t pc, uint32_t offset);

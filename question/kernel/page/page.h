@@ -31,12 +31,12 @@ typedef struct {
     pte_t table[NR_PAGES] __attribute__ ((aligned (1<<14)));
 } pt_t;
 
-void INIT_TABLE(pt_t * pt);
+void INIT_TABLE(pte_t * pt);
 
 void enable_MMU(pte_t * pt);
 
 void access_mem(pte_t * pt);
 
-void user_page(pte_t * pt, int page_no);
+void user_page(pte_t * pt, uint32_t sp);
 
 #endif

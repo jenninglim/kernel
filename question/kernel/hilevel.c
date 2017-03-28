@@ -32,9 +32,7 @@ void hilevel_handler_dab() {
 
 void hilevel_handler_rst(ctx_t* ctx) {
     
-    user_page(T, 1);
-    enable_MMU(T); 
-    
+        
     
 /*
     kernel_page(T); */
@@ -81,7 +79,10 @@ void hilevel_handler_rst(ctx_t* ctx) {
      */
     
     int_enable_irq();
-    
+
+    memcpy(T, rq.current->T, sizeof(uint32_t) * 4096);
+    enable_MMU(T); 
+
     return;
 }
 

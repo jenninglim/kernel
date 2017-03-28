@@ -29,7 +29,7 @@ SECTIONS {
   /* align       address (per AAPCS) */
   .       = ALIGN( 8 );
   /* allocate stack for irq mode     */
-  .       =  0x72000000;  
+  .       =  0x72000000;
   tos_irq = .;
   /* allocate stack for svc mode     */
   .       =  0x72100000;
@@ -61,6 +61,6 @@ SECTIONS {
 
   tos_shared = .;
   /* allocate stack for console */
-  .       =  0x75300000;
+  .       =  0x75200000;
   tos_console = .;
 }
