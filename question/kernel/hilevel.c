@@ -22,7 +22,7 @@ extern void     main_P4();
 extern void     main_P5();
 
 void hilevel_handler_pab() {
-      return;
+    return;
 }
 
 void hilevel_handler_dab() {
@@ -30,8 +30,6 @@ void hilevel_handler_dab() {
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
-    
-        
     
 /*
     kernel_page(T); */
@@ -79,14 +77,16 @@ void hilevel_handler_rst(ctx_t* ctx) {
     
     int_enable_irq();
 
-    enable_MMU(rq.current->T); 
+    access_mem(T);
+    enable_MMU(T); 
 
     return;
 }
 
 void hilevel_handler_irq( ctx_t* ctx) {
     // Step 2: read  the interrupt identifier so we know the source.
-    
+    //mmu_set_ptr0(T);
+    //mmu_flush();
     uint32_t id = GICC0->IAR;
     
     // Step 4: handle the interrupt, then clear (or reset) the source.
@@ -108,6 +108,8 @@ void hilevel_handler_irq( ctx_t* ctx) {
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
+    mmu_set_ptr0(T);
+    mmu_flush();
     /* Based on the identified encoded as an immediate operand in the
      * instruction,
      *

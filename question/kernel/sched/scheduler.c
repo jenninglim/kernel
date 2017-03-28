@@ -6,6 +6,11 @@
 
 void dispatch(task_t * new, ctx_t * ctx) {
     memcpy(ctx, &new->ctx, sizeof(ctx_t));
+    mmu_set_ptr0(new->T);
+    mmu_flush();
+    //mmu_flush();
+    //mmu_unable();
+
 }
 
 void undispatch(task_t * prev, ctx_t * ctx) {
@@ -52,7 +57,6 @@ void sched_update_ctx(runqueue_t * rq, ctx_t * ctx) {
 }
 
 void sched_rq(runqueue_t * rq, ctx_t * ctx) {
-    //update_ctx(&rq->current->ctx, ctx);
     if (sched_prio(&rq->current, rq->active) == false) {
         reallocate_time(rq);
         sched_rq(rq, ctx);

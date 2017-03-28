@@ -67,26 +67,25 @@ void user_page(pte_t * pt, uint32_t sp) {
     for (int i = 0; i < NR_PAGES; i ++) {
         pt[i] = ((pte_t) (i) << 20) | 0x00000002;
         pt[i] &= DOMAIN_MASK;
-         
         if (i >= 0 && i <= 300) {
             pt[i] |= DOMAIN_MANAGER;
         }
         /*
          * Stack access
          */
-        else if ( i == page_no - 1 ) {
+        else if ( i >= (((uint32_t) &tos_kernel) >> 20) - 1) {
             pt[i] |= DOMAIN_MANAGER;
         }
         /*
          * USER domain access
          */
-        else if ( i <= (((uint32_t) tos_usr) >> 20) -1 && i >= (((uint32_t) tos_kernel ) >> 20) -1) {
+        else if ( i <= (((uint32_t) &tos_usr) >> 20) -1 && i >= (((uint32_t) &tos_kernel ) >> 20) -1) {
             pt[i] |= DOMAIN_MANAGER;
         }
         else {
             pt[i] |= DOMAIN_CLIENT;
             pt[i] &= ACCESS_MASK;
-            pt[i] |= AP_PRW_URW;
+            pt[i] |= AP_PRW_URO;
         }
     }
 }
