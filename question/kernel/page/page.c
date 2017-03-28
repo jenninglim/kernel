@@ -85,7 +85,7 @@ void user_page(pte_t * pt, uint32_t sp) {
         else {
             pt[i] |= DOMAIN_CLIENT;
             pt[i] &= ACCESS_MASK;
-            pt[i] |= AP_PRW_URO;
+            pt[i] |= AP_PRW_URW;
         }
     }
 }

@@ -6,11 +6,6 @@
 
 void dispatch(task_t * new, ctx_t * ctx) {
     memcpy(ctx, &new->ctx, sizeof(ctx_t));
-    mmu_set_ptr0(new->T);
-    mmu_flush();
-    //mmu_flush();
-    //mmu_unable();
-
 }
 
 void undispatch(task_t * prev, ctx_t * ctx) {

@@ -22,11 +22,13 @@ extern void     main_P4();
 extern void     main_P5();
 
 void hilevel_handler_pab() {
+    PL011_putc( UART0, 'P', true );
     return;
 }
 
 void hilevel_handler_dab() {
-      return;
+    PL011_putc( UART0, 'D', true );
+    return;
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
@@ -85,8 +87,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
 void hilevel_handler_irq( ctx_t* ctx) {
     // Step 2: read  the interrupt identifier so we know the source.
-    //mmu_set_ptr0(T);
-    //mmu_flush();
+    mmu_set_ptr0(T);
+    mmu_flush();
     uint32_t id = GICC0->IAR;
     
     // Step 4: handle the interrupt, then clear (or reset) the source.
@@ -98,12 +100,12 @@ void hilevel_handler_irq( ctx_t* ctx) {
         time_passed(&rq);
         sched_update_ctx(&rq, ctx);
         sched_rq(&rq, ctx);
-    }
-    
+     }
     // Step 5: write the interrupt identifier to signal we're done.
     
     GICC0->EOIR = id;
-    
+    memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+
     return;
 }
 

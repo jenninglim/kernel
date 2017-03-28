@@ -39,7 +39,7 @@ void add_to_expired(task_t * task, runqueue_t * rq) {
 task_t * rq_add(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t sp) {
     task_t * task = malloc(sizeof(task_t));
     TASK_INIT(task, pc, sp);
-    user_page(task->T, sp);
+    user_page(task->T,sp);
     set_task_pid(task, pid); 
     add_to_active(task, rq);
     add_hash_entry(&rq->pid_table, task);
