@@ -1,6 +1,5 @@
 #include "hilevel.h"
 
-#define NO_OF_PCB 10
 /* Since we *know* there will be 2 processes, stemming from the 2 user
  * programs, we can
  *
@@ -80,8 +79,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
     
     int_enable_irq();
 
-    memcpy(T, rq.current->T, sizeof(uint32_t) * 4096);
-    enable_MMU(T); 
+    enable_MMU(rq.current->T); 
 
     return;
 }
