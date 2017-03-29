@@ -10,8 +10,6 @@ void init_rq(runqueue_t * rq) {
     rq->elapsed_time = 0;
     rq->upid = 0;
 
-    access_mem(rq->kernel_page);
-
     init_prio_array(&rq->arrays[1]);
     init_prio_array(&rq->arrays[0]);
 
@@ -41,7 +39,7 @@ void add_to_expired(task_t * task, runqueue_t * rq) {
 task_t * rq_add(runqueue_t * rq, pid_t pid, uint32_t pc, uint32_t sp) {
     task_t * task = malloc(sizeof(task_t));
     TASK_INIT(task, pc, sp);
-    user_page(task->T,sp);
+    user_page(task->T, pid);
     set_task_pid(task, pid); 
     add_to_active(task, rq);
     add_hash_entry(&rq->pid_table, task);
@@ -73,20 +71,15 @@ pid_t new_pid(runqueue_t * rq) {
 
 task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc) {
     pid_t npid = new_pid(rq); 
-    return rq_add(rq, npid, pc, (uint32_t) &tos_usr - npid * STACKSPACE);
-}
-
-task_t * rq_add_console(runqueue_t * rq) {
-    pid_t npid = new_pid(rq);
-    return rq_add(rq, npid, (uint32_t) (&main_console), (uint32_t) (&tos_console));
+    return rq_add(rq, npid, pc, VIRTUAL_MEM);
 }
 
 task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx) {
     pid_t npid = new_pid(rq); 
     task_t * clone = rq_add(rq, npid, ctx->pc, ctx->sp);
-    uint32_t offset = ((uint32_t) &tos_usr) - ((uint32_t) rq->current->pid * STACKSPACE) - ctx->sp;
-    task_clone(clone, ctx, ((uint32_t) &tos_usr) - npid * STACKSPACE - offset);
-    memcpy( (char *) ((uint32_t) &tos_usr) - (npid + 1) * STACKSPACE, (char *) ((uint32_t) &tos_usr) - (rq->current->pid + 1) * STACKSPACE, STACKSPACE); 
+    task_clone(clone, ctx, ctx->sp);
+    memcpy((char *) ((uint32_t) &tos_usr) - (npid + 1) * STACKSPACE, (char *) ((uint32_t) &tos_usr) - (rq->current->pid + 1) * STACKSPACE, STACKSPACE); 
+
     return clone;
 }
 

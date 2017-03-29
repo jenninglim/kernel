@@ -1,7 +1,9 @@
 #include "page.h"
 
 extern uint32_t tos_usr;
+extern uint32_t tos_user_seg;
 extern uint32_t tos_kernel;
+extern uint32_t tos_shared;
 
 void INIT_TABLE(pte_t * pt) {
    for (int i = 0; i < NR_PAGES; i++ ) {
@@ -28,20 +30,6 @@ void enable_MMU(pte_t * pt) {
     mmu_enable();
 }
 
-/*
-void kernel_page(pt_t * pt) {
-    for (int i = 0; i < NR_PAGES; i ++) {
-        pt->table[i] = ((pte_t) (i) << 20);
-
-        if (i >= 700 && i < 828) {
-            pt->table[i] &= DOMAIN_MASK;
-            pt->table[i] &= ACCESS_MASK;
-            pt->table[i] |= AP_PRW_URW;
-        }
-    }
-}
-*/
-
 void access_mem(pte_t * pt) {
     for (int i = 0; i < NR_PAGES; i ++) {
         pt[i] = ((pte_t) (i) << 20) | 0x00000002;
@@ -51,43 +39,32 @@ void access_mem(pte_t * pt) {
 }
 
 void user_page(pte_t * pt, uint32_t pid) {
-    uint32_t page_no = (sp & 0xFFF00000 >> 20);
     for (int i = 0; i < NR_PAGES; i ++) {
-        if (i < 0x720 ) {
+        pt[i] &= DOMAIN_MASK;
+        if ( i <= 0x600) {
+            pt[i] = ((pte_t) i << 20) | 0x00000002;
+            pt[i] |= DOMAIN_MANAGER;
+        }
+        else if (i < 0x722  && i >= 0x700) {
             pt[i] = ((pte_t) (i) << 20) | 0x00000002;
-            pt[i] &= DOMAIN_MASK;
-            if (i >= 0 && i <= 300) {
-                pt[i] |= DOMAIN_MANAGER;
-            }
-            /*
-             * Stack access
-             */
-            else if ( i >= (((uint32_t) &tos_kernel) >> 20) - 1) {
-                pt[i] |= DOMAIN_MANAGER;
-            }
-            /*
-             * USER domain access
-             */
-            else if ( i <= (((uint32_t) &tos_usr) >> 20) -1 && i >= (((uint32_t) &tos_kernel ) >> 20) -1) {
-                pt[i] |= DOMAIN_MANAGER;
-            }
-            else {
-                pt[i] |= DOMAIN_CLIENT;
-                pt[i] &= ACCESS_MASK;
-                pt[i] |= AP_PRW_URO;
-            }
+            pt[i] |= DOMAIN_CLIENT;
+            pt[i] &= ACCESS_MASK;
+            pt[i] |= AP_PRW_URW;
         }
-        else if (i < (&tos_user_seg >> 20)) {
+        else if (i < 0x730  && i >= 0x722) {
             pt[i] = ((pte_t) (i) << 20) | 0x00000002;
+            pt[i] |= DOMAIN_CLIENT;
+            pt[i] &= ACCESS_MASK;
+            pt[i] |= AP_PRW_URW;         
         }
-        else if (i == (&tos_user_seg)) {
-            pt[i] = (((pte_t) (&tos_usr >> 20) -1 - pid) << 20) |0x00000002;
+        else if (i == 0x730 ) {
+            pt[i] = ((pte_t) (0x740 - 1 - pid)) << 20 | 0x00000002;
+            pt[i] |= DOMAIN_MANAGER;
         }
-        else if (i == (&tos_user_seg) + 1) {
-            pt[i] = ((pte_t ) (&tos_usr >> 20)  << 20)
-        }
-        else if ( i >= (((uint32_t) &tos_kernel) >> 20) - 1) {
+        else if (i == 0x731) {
+            pt[i] = ((pte_t ) ( 0x740 ))  << 20 | 0x00000002;
             pt[i] |= DOMAIN_MANAGER;
         }
     }
 }
+

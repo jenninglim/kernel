@@ -1,9 +1,6 @@
 #ifndef __SCHEDULER_H
 #define __SCHEDULER_H
 
-#define TASK_RUNNING 0
-#define TASK_INTERRUPTIBLE 1
-
 // Include functionality relating to newlib
 
 #include <stdbool.h>

@@ -12,6 +12,7 @@
 #include "SP804.h"
 
 #define STACKSPACE 0x00100000
+#define VIRTUAL_MEM 0x73100000
 
 #include "hash/hash.h"
 #include "sched/task.h"
@@ -24,7 +25,6 @@ typedef struct runqueue {
     task_t * current;
     task_t * idle;
     pid_t upid;
-    pte_t kernel_page[4096] __attribute ((aligned (1 << 14)));
     int elapsed_time;
     pid_table_t pid_table;
     prio_array_t * active;
@@ -69,8 +69,6 @@ void reallocate_time(runqueue_t * rq);
 task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx);
 
 task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc);
-
-task_t * rq_add_console(runqueue_t * rq);
 
 task_t * rq_find_task_pid(runqueue_t * rq, pid_t pid);
 

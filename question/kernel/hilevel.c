@@ -28,6 +28,7 @@ void hilevel_handler_pab() {
 
 void hilevel_handler_dab() {
     PL011_putc( UART0, 'D', true );
+
     return;
 }
 
@@ -66,7 +67,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
-    rq_add_console(&rq);
+    rq_add_new_task(&rq,(uint32_t) (&main_console));
 
     sched_rq(&rq, ctx);
 
@@ -76,8 +77,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
     
     int_enable_irq();
 
-    access_mem(T);
-    enable_MMU(T); 
+    memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    enable_MMU(T);
 
     return;
 }
@@ -85,7 +86,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
 void hilevel_handler_irq( ctx_t* ctx) {
     // Step 2: read  the interrupt identifier so we know the source.
 
-    memcpy(T, rq.kernel_page, 4096 * sizeof(uint32_t));
+    mmu_unable();
     mmu_flush();
     uint32_t id = GICC0->IAR;
     
@@ -102,14 +103,14 @@ void hilevel_handler_irq( ctx_t* ctx) {
     // Step 5: write the interrupt identifier to signal we're done.
     
     GICC0->EOIR = id;
-    mmu_flush();
     memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    mmu_enable();
 
     return;
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
-    memcpy(T, rq.kernel_page, 4096 * sizeof(uint32_t));
+    mmu_unable();
     mmu_flush();
     /* Based on the identified encoded as an immediate operand in the
      * instruction,
@@ -152,6 +153,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         case 0x05 : { // 0x05 => exec( pc )
             ctx->pc = ctx->gpr[0];
+            ctx->sp = ((uint32_t) 0x73100000) - 1;
+
             //TODO CHANGE SP
             //TODO SET STACK EMPTY
             break;
@@ -167,20 +170,21 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x0A : { // 0x0A => SHEM_OPEN ();
-            ctx->gpr[0] = (int) memcpy(sharedmem, (void * ) ctx->gpr[0], ctx->gpr[1]);
+            ctx->gpr[0] = (uint32_t) 0x73100000;
+            (int) memcpy(sharedmem, (void * ) ctx->gpr[0], ctx->gpr[1]);
+
             //TODO :: SHARED MEMORY OFFSET
             break;
         }
 
 
         default   : { // 0x?? => unknown/unsupported
-
             break;
         }
     }
 
-    mmu_flush();
     memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    mmu_enable();
 
 
     return;
