@@ -45,22 +45,34 @@ void user_page(pte_t * pt, uint32_t pid) {
             pt[i] = ((pte_t) i << 20) | 0x00000002;
             pt[i] |= DOMAIN_MANAGER;
         }
+        /*
+         *  KERNEL SEGMENT
+         */
         else if (i < 0x722  && i >= 0x700) {
+            pt[i] = ((pte_t) (i) << 20) | 0x00000002;
+            pt[i] |= DOMAIN_CLIENT;
+            pt[i] &= ACCESS_MASK;
+            pt[i] |= AP_PRW_URO;
+        }
+        /*
+         * USER SEGEMENT
+         */
+        else if (i < 0x730  && i >= 0x722) {
             pt[i] = ((pte_t) (i) << 20) | 0x00000002;
             pt[i] |= DOMAIN_CLIENT;
             pt[i] &= ACCESS_MASK;
             pt[i] |= AP_PRW_URW;
         }
-        else if (i < 0x730  && i >= 0x722) {
-            pt[i] = ((pte_t) (i) << 20) | 0x00000002;
-            pt[i] |= DOMAIN_CLIENT;
-            pt[i] &= ACCESS_MASK;
-            pt[i] |= AP_PRW_URW;         
-        }
+        /*
+         *  SPECIFIC PROCESS STACK
+         */
         else if (i == 0x730 ) {
             pt[i] = ((pte_t) (0x740 - 1 - pid)) << 20 | 0x00000002;
             pt[i] |= DOMAIN_MANAGER;
         }
+        /*
+         *  SHARED MEMORY
+         */
         else if (i == 0x731) {
             pt[i] = ((pte_t ) ( 0x740 ))  << 20 | 0x00000002;
             pt[i] |= DOMAIN_MANAGER;

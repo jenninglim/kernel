@@ -56,7 +56,7 @@ SECTIONS {
   }
   /* align       address (per AAPCS) */
   .       = ALIGN( 8 );
-  .       =  0x73000000;
+  .       =  0x74000000;
   /* place stack usr */
   tos_usr = .;
   /* place stack shared */

@@ -71,7 +71,7 @@ pid_t new_pid(runqueue_t * rq) {
 
 task_t * rq_add_new_task(runqueue_t * rq, uint32_t pc) {
     pid_t npid = new_pid(rq); 
-    return rq_add(rq, npid, pc, VIRTUAL_MEM);
+    return rq_add(rq, npid, pc, VIRTUAL_MEM - 1);
 }
 
 task_t * rq_add_clone(runqueue_t * rq, ctx_t * ctx) {
