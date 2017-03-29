@@ -32,9 +32,6 @@ void hilevel_handler_dab() {
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
-    
-/*
-    kernel_page(T); */
     // Initialised runqueue.
     
     init_rq(&rq);
@@ -87,7 +84,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
 void hilevel_handler_irq( ctx_t* ctx) {
     // Step 2: read  the interrupt identifier so we know the source.
-    mmu_set_ptr0(T);
+
+    memcpy(T, rq.kernel_page, 4096 * sizeof(uint32_t));
     mmu_flush();
     uint32_t id = GICC0->IAR;
     
@@ -104,13 +102,14 @@ void hilevel_handler_irq( ctx_t* ctx) {
     // Step 5: write the interrupt identifier to signal we're done.
     
     GICC0->EOIR = id;
+    mmu_flush();
     memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
 
     return;
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
-    mmu_set_ptr0(T);
+    memcpy(T, rq.kernel_page, 4096 * sizeof(uint32_t));
     mmu_flush();
     /* Based on the identified encoded as an immediate operand in the
      * instruction,
@@ -143,8 +142,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             task_t * child = rq_add_clone(&rq, ctx);
             ctx->gpr[0] = child->pid;
             child->ctx.gpr[0] = 0;
-
-            //Copy stack
             break;
         }
         case 0x04 : { // 0x04 => exit()
@@ -181,6 +178,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
     }
-    
+
+    mmu_flush();
+    memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+
+
     return;
 }

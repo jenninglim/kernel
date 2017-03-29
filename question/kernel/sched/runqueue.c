@@ -10,6 +10,8 @@ void init_rq(runqueue_t * rq) {
     rq->elapsed_time = 0;
     rq->upid = 0;
 
+    access_mem(rq->kernel_page);
+
     init_prio_array(&rq->arrays[1]);
     init_prio_array(&rq->arrays[0]);
 
