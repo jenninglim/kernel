@@ -1,4 +1,5 @@
 #include "P6.h"
+
 int isPrime( uint32_t x ) {
   if ( !( x & 1 ) || ( x < 2 ) ) {
     return ( x == 2 );
@@ -14,7 +15,7 @@ int isPrime( uint32_t x ) {
 }
 
 void printInt(int id, state_e state) {
-    char * str;
+    char str[3];
     char message[10]; 
     itoa(str, id);
     switch (state) {
