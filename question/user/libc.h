@@ -79,7 +79,7 @@ extern void set_prio( int pid, int prio );
 extern int get_pid();
 
 //opennn
-extern int * sem_open( int value);
+extern int sem_open( int value);
 
 // increament a semaphore.
 extern void sem_post(int * sem);
@@ -87,7 +87,7 @@ extern void sem_post(int * sem);
 extern void sem_wait(int * sem);
 
 // open shared memory.
-extern void * shm_open( void * data, int size );
+extern int shm_open( void * data, int size );
 
 extern int sem_write(int sema_id, void * data);
 

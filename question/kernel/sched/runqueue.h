@@ -26,6 +26,7 @@ typedef struct runqueue {
     task_t * idle;
     pid_t upid;
     int elapsed_time;
+    pte_t  kernel_pg[4096];
     pid_table_t pid_table;
     prio_array_t * active;
     prio_array_t * expired;

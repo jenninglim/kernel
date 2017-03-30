@@ -150,8 +150,8 @@ int get_pid() {
   return r;
 }
 
-int * sem_open (int value) {
-    int * r;
+int sem_open (int value) {
+    int r;
     asm volatile( "mov r0, %2 \n"
                   "svc %1 \n"
                   "mov %0, r0 \n"
@@ -161,8 +161,8 @@ int * sem_open (int value) {
     return r;
 }
 
-void * shm_open ( void * data, int size ) {
-    int * r;
+int shm_open ( void * data, int size ) {
+    int r;
     asm volatile( "mov r0, %2 \n"
                   "mov r1, %3 \n"
                   "svc %1 \n"

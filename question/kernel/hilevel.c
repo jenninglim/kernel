@@ -9,9 +9,8 @@
  *   can be created, and neither is able to complete.
  */
 
+shared_t shared;
 runqueue_t rq;         //For schedulling
-semtable_t semtable;   //For shared memory
-int32_t * sharedmem;
 pte_t  T[4096] __attribute__ ((aligned (1<<14)));
 
 extern void     main_console();
@@ -36,9 +35,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
     // Initialised runqueue.
     
     init_rq(&rq);
-
-    // Initialise shared mem
-    sharedmem = &tos_shared;
     /* Configure the mechanism for interrupt handling by
      *
      * - configuring timer st. it raises a (periodic) interrupt for each
@@ -85,9 +81,10 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
 void hilevel_handler_irq( ctx_t* ctx) {
     // Step 2: read  the interrupt identifier so we know the source.
-
-    mmu_unable();
+    
     mmu_flush();
+    mmu_unable();
+    
     uint32_t id = GICC0->IAR;
     
     // Step 4: handle the interrupt, then clear (or reset) the source.
@@ -103,15 +100,17 @@ void hilevel_handler_irq( ctx_t* ctx) {
     // Step 5: write the interrupt identifier to signal we're done.
     
     GICC0->EOIR = id;
-    memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    
+    mmu_unable();
+    enable_page(rq.current->T, T);
     mmu_enable();
-
     return;
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     mmu_unable();
-    mmu_flush();
+    enable_kl_pg(rq.kernel_pg, T, rq.current->pid);
+    mmu_enable();
     /* Based on the identified encoded as an immediate operand in the
      * instruction,
      *
@@ -140,9 +139,11 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x03 : { // 0x03 => fork()
+            mmu_unable();
             task_t * child = rq_add_clone(&rq, ctx);
             ctx->gpr[0] = child->pid;
             child->ctx.gpr[0] = 0;
+            mmu_enable();
             break;
         }
         case 0x04 : { // 0x04 => exit()
@@ -153,8 +154,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         case 0x05 : { // 0x05 => exec( pc )
             ctx->pc = ctx->gpr[0];
-            ctx->sp = ((uint32_t) 0x73100000) - 1;
-
+            ctx->sp = ((uint32_t) 0x73100000);
             //TODO CHANGE SP
             //TODO SET STACK EMPTY
             break;
@@ -166,26 +166,21 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break; 
         }
         case 0x09 : { // 0x09 => SEM_OPEN ()
-            ctx->gpr[0] = (int) add_sem(&semtable, ctx->gpr[0]);
+            ctx->gpr[0] = (uint32_t) add_sem( &shared, (uint32_t) ctx->gpr[0]);
             break;
         }
         case 0x0A : { // 0x0A => SHEM_OPEN ();
-            ctx->gpr[0] = (uint32_t) 0x73100000;
-            (int) memcpy(sharedmem, (void * ) ctx->gpr[0], ctx->gpr[1]);
-
-            //TODO :: SHARED MEMORY OFFSET
+            ctx->gpr[0] = (uint32_t) add_shared( &shared, (void *) ctx->gpr[0], (uint32_t) ctx->gpr[1]);
             break;
         }
-
-
         default   : { // 0x?? => unknown/unsupported
             break;
         }
     }
-
-    memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    
+    mmu_unable();
+    enable_page(rq.current->T, T);
     mmu_enable();
-
 
     return;
 }

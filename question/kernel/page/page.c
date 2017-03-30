@@ -30,12 +30,23 @@ void enable_MMU(pte_t * pt) {
     mmu_enable();
 }
 
-void access_mem(pte_t * pt) {
+void kernel_page(pte_t * pt, uint32_t pid) {
     for (int i = 0; i < NR_PAGES; i ++) {
-        pt[i] = ((pte_t) (i) << 20) | 0x00000002;
         pt[i] &= DOMAIN_MASK;
-        pt[i] |= DOMAIN_MANAGER;
+        if (i == 0x730 ) {
+            pt[i] = ((pte_t) (0x740 - 1 - pid)) << 20 | 0x00000002;
+            pt[i] |= DOMAIN_MANAGER;
+        }
+        else if (i == 0x731) {
+            pt[i] = ((pte_t ) ( 0x740))  << 20 | 0x00000002;
+            pt[i] |= DOMAIN_MANAGER;
+        }
+        else {
+            pt[i] = ((pte_t) (i) << 20) | 0x00000002;
+            pt[i] |= DOMAIN_MANAGER;
+        }
     }
+
 }
 
 void user_page(pte_t * pt, uint32_t pid) {
@@ -78,5 +89,15 @@ void user_page(pte_t * pt, uint32_t pid) {
             pt[i] |= DOMAIN_MANAGER;
         }
     }
+}
+
+void enable_page(pte_t * pt, pte_t * T) {
+    mmu_flush();
+    memcpy(T, pt, sizeof(uint32_t) * 4096);
+}
+
+void enable_kl_pg(pte_t * pt, pte_t * T, uint32_t pid) {
+    kernel_page(pt, pid);
+    enable_page(pt, T);
 }
 

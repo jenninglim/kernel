@@ -39,4 +39,8 @@ void access_mem(pte_t * pt);
 
 void user_page(pte_t * pt, uint32_t sp);
 
+void enable_page(pte_t * pt, pte_t * T);
+
+void enable_kl_pg(pte_t * pt, pte_t * T, uint32_t pid);
+
 #endif

@@ -1,5 +1,8 @@
 #include "P6.h"
 
+int * philo[NO_OF_PHILOSOPHERS];
+int * me;
+
 int isPrime( uint32_t x ) {
   if ( !( x & 1 ) || ( x < 2 ) ) {
     return ( x == 2 );
@@ -16,7 +19,7 @@ int isPrime( uint32_t x ) {
 
 void printInt(int id, state_e state) {
     char str[3];
-    char message[10]; 
+    char message[10];
     itoa(str, id);
     switch (state) {
         case T:
@@ -72,7 +75,7 @@ void think() {
     }
 }
 
-void philosophers(int id,int * me, state_e * statetable, int * semtable[]) {
+void philosophers(int id, state_e * statetable, int * semtable[]) {
     while (1) {
         switch (statetable[id]) {
             case E:
@@ -102,28 +105,30 @@ void philosophers(int id,int * me, state_e * statetable, int * semtable[]) {
     }
         
 }
-    int * philo[NO_OF_PHILOSOPHERS];
 
 void main_P6() {
+    state_e * table;
+    
     state_e state[NO_OF_PHILOSOPHERS];
     for (int i = 0; i < NO_OF_PHILOSOPHERS; i++ ) {
         state[i] = 0;
     }
-
-    state_e * table;
-    table = shm_open(state, sizeof(state));
     
+    table = (state_e *) shm_open(state, sizeof(state));
+
     int pid = 0;
-    int * sem_array = sem_open(1);
+    
+    
+    me = (int *) sem_open(1);
 
     //int * philo[NO_OF_PHILOSOPHERS];
     for (int i = 0; i < NO_OF_PHILOSOPHERS; i++ ) {
-        philo[i] = sem_open(0);
+        philo[i] = (int *) sem_open(0);
     }
     for (int i = 0; i < NO_OF_PHILOSOPHERS; i ++ ) {
         pid = fork(); 
         if ( pid == 0 ) {
-            philosophers( i, sem_array, table, philo );
+            philosophers( i, table, philo );
         }
     }
     exit( EXIT_SUCCESS );

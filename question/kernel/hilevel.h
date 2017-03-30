@@ -20,7 +20,7 @@
 #include "lolevel.h"
 #include     "int.h"
 #include "sched/scheduler.h"
-#include "sema/sema.h"
+#include "shared/shared.h"
 #include "page/page.h"
 
 #endif
