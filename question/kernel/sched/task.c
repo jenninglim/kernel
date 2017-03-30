@@ -13,7 +13,6 @@ void TASK_INIT(task_t * new_task, uint32_t pc, uint32_t sp) {
     INIT_LIST_HEAD(&new_task->node);
     new_task->prio = 0;
     new_task->ctx = new_ctx;
-    INIT_TABLE(new_task->T);
 }
 
 void task_clone(task_t * task, ctx_t * ctx, uint32_t sp) {

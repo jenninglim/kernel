@@ -5,19 +5,10 @@ extern uint32_t tos_user_seg;
 extern uint32_t tos_kernel;
 extern uint32_t tos_shared;
 
-void INIT_TABLE(pte_t * pt) {
-   for (int i = 0; i < NR_PAGES; i++ ) {
-        pt[i] = 0; //TODO decide here.
-   }
-   return;
-}
-
 void set_domain_range() {
     //Set doamin access
     mmu_set_dom( 0, 0x3 ); // set domain 0 to 11_{(2)} => manager (i.e., not checked)
     mmu_set_dom( 1, 0x1 ); // set domain 1 to 01_{(2)} => client  (i.e.,     checked)
-    
-
 }
 
 void enable_MMU(pte_t * pt) {

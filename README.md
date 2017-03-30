@@ -43,19 +43,19 @@ outside this list can warrant an increase/decrease in marks, with examples
 including hard to quantify features such as the efficiency, robustness,  
 generality, realism, or style of a solution.  
 
-* [?] Stage 1 : pre-emptive operating system kernel                    ( 30%)
+* [X] Stage 1 : pre-emptive operating system kernel                    ( 30%)
 
 *    Stage 2 : close generalisations and enhancements
 
-  * [?]           - fork, exec and exit system calls                     ( 15%)
+  * [X]           - fork, exec and exit system calls                     ( 15%)
   
-  * [?]           - priority based scheduler                             ( 10%)
+  * [X]           - priority based scheduler                             ( 10%)
   
-  * [?]           - Inter-Process Communication (IPC)                    ( 15%)
+  * [X]           - Inter-Process Communication (IPC)                    ( 15%)
 
 *    Stage 3 : open  generalisations and enhancements                 ( 30%)
 
-  * [?]           - MMU-based protection and virtualisation
+  * [X]           - MMU-based protection and virtualisation
                 
   * [?]           - LCD screen and PS/2 device drivers and GUI
   

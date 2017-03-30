@@ -4,7 +4,6 @@ extern uint32_t tos_usr;
 
 void init_rq(runqueue_t * rq) {
     rq->current = NULL;
-    rq->idle = malloc(sizeof(task_t));
     
     HASH_INIT(&rq->pid_table);
     rq->elapsed_time = 0;
@@ -93,9 +92,5 @@ void reallocate_time(runqueue_t * rq) {
     prio_array_t * temp = rq->active;
     rq->active = rq->expired;
     rq->expired = temp;
-    return;
-}
-
-void idle(runqueue_t * rq) {
     return;
 }

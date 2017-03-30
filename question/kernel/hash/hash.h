@@ -24,14 +24,19 @@ typedef struct {
     list_head entry[SIZE];
 } pid_table_t;
 
+// Initialise hash table.
 void HASH_INIT (pid_table_t * table);
 
+// Hashing function.
 int hash_PID(pid_t pid);
 
+// Find task based on PID.
 task_t * find_task_pid(pid_table_t * table, pid_t pid);
 
+// Add hash entry.
 void add_hash_entry(pid_table_t * table, task_t * entry);
 
+// Remove a hash entry.
 void remove_hash_entry(pid_table_t * table, pid_t pid);
 
 #endif

@@ -44,6 +44,7 @@ void sched_rq(runqueue_t * rq, ctx_t * ctx);
 /*
  * Update rq with elapsed time.
  */
+
 void time_passed(runqueue_t * rq);
 
 #endif

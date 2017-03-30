@@ -20,14 +20,18 @@
  * - a type that captures a process PCB.
  */
 
+// PID type.
 typedef int pid_t;
 
+// Context type.
 typedef struct {
         uint32_t cpsr, pc, gpr[ 13 ], sp, lr;
 } ctx_t;
 
+// Initialise new context.
 void INIT_CTX(ctx_t * ctx, uint32_t cpsr, uint32_t pc, uint32_t sp);
 
+// Update a context.
 void update_ctx(ctx_t * new, ctx_t * source);
 
 #endif

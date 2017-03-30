@@ -9,9 +9,9 @@
  *   can be created, and neither is able to complete.
  */
 
-shared_t shared;
-runqueue_t rq;         //For schedulling
-pte_t  T[4096] __attribute__ ((aligned (1<<14)));
+shared_t shared;                                      // Shared memory.
+runqueue_t rq;                                        // Scheduling structure.
+pte_t  T[4096] __attribute__ ((aligned (1<<14)));     // Current page.
 
 extern void     main_console();
 extern uint32_t tos_shared;
@@ -22,19 +22,21 @@ extern void     main_P5();
 
 void hilevel_handler_pab() {
     PL011_putc( UART0, 'P', true );
+    // TODO: Kill process.
     return;
 }
 
 void hilevel_handler_dab() {
     PL011_putc( UART0, 'D', true );
-
+    // TODO: Kill process.
     return;
 }
 
 void hilevel_handler_rst(ctx_t* ctx) {
-    // Initialised runqueue.
     
+    // Initialised runqueue.
     init_rq(&rq);
+    
     /* Configure the mechanism for interrupt handling by
      *
      * - configuring timer st. it raises a (periodic) interrupt for each
@@ -63,28 +65,31 @@ void hilevel_handler_rst(ctx_t* ctx) {
      * - the PC and SP values matche the entry point and top of stack.
      */
     
+    // Add console to runqueue.
     rq_add_new_task(&rq,(uint32_t) (&main_console));
-
-    sched_rq(&rq, ctx);
-
-    /* Once the PCBs are initialised, we (arbitrarily) select one to be
-     * restored (i.e., executed) when the function then returns.
-     */
     
+    // Scheduling runqueue.
+    sched_rq(&rq, ctx);
+    
+    // Enable IRQ interrupt.
     int_enable_irq();
-
+    
+    // Set current page.
     memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
+    
+    //Enable MMU.
     enable_MMU(T);
 
     return;
 }
 
 void hilevel_handler_irq( ctx_t* ctx) {
-    // Step 2: read  the interrupt identifier so we know the source.
     
+    // FLUSH MMU and disable.
     mmu_flush();
     mmu_unable();
     
+    // Step 2: read  the interrupt identifier so we know the source.
     uint32_t id = GICC0->IAR;
     
     // Step 4: handle the interrupt, then clear (or reset) the source.
@@ -101,16 +106,21 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     GICC0->EOIR = id;
     
-    mmu_unable();
+    // Set current page.
     enable_page(rq.current->T, T);
+    
+    // Enable MMU.
     mmu_enable();
     return;
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
+    
+    // Disable MMU.
     mmu_unable();
     enable_kl_pg(rq.kernel_pg, T, rq.current->pid);
     mmu_enable();
+    
     /* Based on the identified encoded as an immediate operand in the
      * instruction,
      *
@@ -155,14 +165,16 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         case 0x05 : { // 0x05 => exec( pc )
             ctx->pc = ctx->gpr[0];
             ctx->sp = ((uint32_t) 0x73100000);
-            //TODO CHANGE SP
-            //TODO SET STACK EMPTY
+            
+            //TODO: SET STACK EMPTY
             break;
         }
         case 0x07 : { // 0x07 => set_prio( pid, prio )
             pid_t pid = (pid_t) ctx->gpr[0];
             int prio = ctx->gpr[1];
-            rq_task_prio_change(&rq, pid, prio); 
+            rq_task_prio_change(&rq, pid, prio);
+            
+            //TODO: if no process found or exited.
             break; 
         }
         case 0x09 : { // 0x09 => SEM_OPEN ()
@@ -178,6 +190,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
     }
     
+    //Enable MMU.
     mmu_unable();
     enable_page(rq.current->T, T);
     mmu_enable();
