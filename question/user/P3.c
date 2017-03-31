@@ -15,7 +15,6 @@ int is_prime( uint32_t x ) {
 }
 
 void main_P3() {
-  //memset((char *) 0x70200000,0,sizeof(int32_t));
   for( int i = 0; i < 50; i++ ) {
     write( STDOUT_FILENO, "P3", 2 );
 
