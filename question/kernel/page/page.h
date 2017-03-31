@@ -9,12 +9,12 @@
 
 //APPLY MASK BEFORE USE.
 //OR THE MASK.
-#define DOMAIN_CLIENT  0x00000020
-#define DOMAIN_MANAGER 0x00000000 //0x000000060
+#define DOMAIN_CLIENT  0x00000020 // Domain CLIENT.
+#define DOMAIN_MANAGER 0x00000000 // Domain Manager.
 
-#define MEM_ACCESSIBLE 0x00000010
-#define AP_PRW_URW     0x00000C00
-#define AP_PRW_URO     0x00000800
+#define MEM_ACCESSIBLE 0x00000010 // MEMORY ACESSABLE
+#define AP_PRW_URW     0x00000C00 // Priviledge Read Write. User Read Write.
+#define AP_PRW_URO     0x00000800 // Priviledge Read Write. User Read Only.
 #define AP_PRW_UNA     0x00000400
 #define AP_PNA_UNA     0x00000000
 
@@ -25,20 +25,22 @@
 
 #include "MMU.h"
 
+// Page table entry.
 typedef uint32_t pte_t;
 
-typedef struct {
-    pte_t table[NR_PAGES] __attribute__ ((aligned (1<<14)));
-} pt_t;
-
+// Enable MMU.
 void enable_MMU(pte_t * pt);
 
+// Full Access Page.
 void access_mem(pte_t * pt);
 
+// Create User Page.
 void user_page(pte_t * pt, uint32_t sp);
 
+// Enable Page.
 void enable_page(pte_t * pt, pte_t * T);
 
+// Enable Kernel Page.
 void enable_kl_pg(pte_t * pt, pte_t * T, uint32_t pid);
 
 #endif

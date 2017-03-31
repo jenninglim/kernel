@@ -29,7 +29,6 @@ task_t * find_task_pid(pid_table_t * table, pid_t pid) {
 
 void add_hash_entry(pid_table_t * table, task_t * entry) {
     pid_t pid = entry->pid;
-    // Initialise PID
     pid_node_t * new_entry = malloc(sizeof(pid_node_t));
 
     new_entry->task = entry;

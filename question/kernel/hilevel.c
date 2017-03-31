@@ -15,20 +15,44 @@ pte_t  T[4096] __attribute__ ((aligned (1<<14)));     // Current page.
 
 extern void     main_console();
 extern uint32_t tos_shared;
-extern uint32_t tos_console;
+extern uint32_t tos_usr;
+
 extern void     main_P3();
 extern void     main_P4();
 extern void     main_P5();
 
-void hilevel_handler_pab() {
-    PL011_putc( UART0, 'P', true );
-    // TODO: Kill process.
+// Prefetch abort => Kill process.
+void hilevel_handler_pab(ctx_t * ctx) {
+    mmu_unable();
+    
+    char * x = "PROCESS KILLED";
+    for (int i = 0; i < 15 ; i++ ) {
+        PL011_putc( UART0, x[i], true );
+    }
+    
+    task_t * removed = rq_remove_task(&rq, rq.current->pid);
+    free(removed);
+    sched_rq(&rq, ctx);
+    
+    mmu_enable();
     return;
 }
 
-void hilevel_handler_dab() {
-    PL011_putc( UART0, 'D', true );
-    // TODO: Kill process.
+// Data abord => Kill process.
+void hilevel_handler_dab(ctx_t * ctx) {
+    
+    mmu_unable();
+    
+    char * x = "PROCESS KILLED";
+    for (int i = 0; i < 15 ; i++ ) {
+        PL011_putc( UART0, x[i], true );
+    }
+    
+    task_t * removed = rq_remove_task(&rq, rq.current->pid);
+    free(removed);
+    sched_rq(&rq, ctx);
+    
+    mmu_enable();
     return;
 }
 
@@ -126,6 +150,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     
     // Disable MMU.
     mmu_unable();
+    
     enable_kl_pg(rq.kernel_pg, T, rq.current->pid);
     mmu_enable();
     
@@ -165,24 +190,26 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
             break;
         }
         case 0x04 : { // 0x04 => exit()
+            mmu_unable();
             task_t * removed = rq_remove_task(&rq, rq.current->pid);
             free(removed);
             sched_rq(&rq, ctx);
+            mmu_enable();
             break;
         }
         case 0x05 : { // 0x05 => exec( pc )
+            mmu_unable();
             ctx->pc = ctx->gpr[0];
             ctx->sp = ((uint32_t) 0x73100000);
             
-            //TODO: SET STACK EMPTY
+            memset((char *) ((uint32_t) &tos_usr - 0x00100000 * (rq.current->pid + 1)), 0, 0x00100000);
+            mmu_enable();
             break;
         }
         case 0x07 : { // 0x07 => set_prio( pid, prio )
             pid_t pid = (pid_t) ctx->gpr[0];
             int prio = ctx->gpr[1];
             rq_task_prio_change(&rq, pid, prio);
-            
-            //TODO: if no process found or exited.
             break; 
         }
         case 0x09 : { // 0x09 => SEM_OPEN ()

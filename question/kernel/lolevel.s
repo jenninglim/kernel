@@ -63,19 +63,36 @@ lolevel_handler_irq: sub   lr, lr, #4              @ correct return address
                      add   sp, sp, #60             @ update IRQ mode SP
                      movs  pc, lr                  @ Switches back to user mode
 
-lolevel_handler_pab: sub   lr, lr, #4              @ correct return address
-                     stmfd sp!, { r0-r3, ip, lr }  @ save    caller-save registers
+lolevel_handler_pab:  sub   lr, lr, #4              @ correct return address
+                      sub   sp, sp, #60             @ update PAB mode stack
+                      stmia sp, { r0-r12, sp, lr }^ @ store USR mode stack
+                      mrs   r0, spsr                @ get USR CPSR
+                      stmdb sp!, { r0, lr }         @ store USR PC and CPSR
 
-                     bl    hilevel_handler_pab     @ invoke high-level C function
+                      mov   r0, sp                  @ set high-level C function arg. = SP
+                      bl    hilevel_handler_pab     @ invoke high-level C function
 
-                     ldmfd sp!, { r0-r3, ip, lr }  @ restore caller-save registers
-                     movs  pc, lr                  @ return from interrupt	
+                      ldmia sp!, { r0, lr }         @ load USR mode PC and CPSR
+                      msr   spsr, r0                @ set  USR mode CPSR
+                      ldmia sp, { r0-r12, sp, lr }^ @ load USR mode register
+                      add   sp, sp, #60             @ update PAB mode SP
+                      movs  pc, lr                  @ Switches back to user modesub   lr, lr, #4              @ correct return address
+                      stmfd sp!, { r0-r3, ip, lr }  @ save    caller-save registers
+
 
 lolevel_handler_dab: sub   lr, lr, #8              @ correct return address
-                     stmfd sp!, { r0-r3, ip, lr }  @ save    caller-save registers
+                     sub   sp, sp, #60             @ update DAB mode stack
+                     stmia sp, { r0-r12, sp, lr }^ @ store USR mode stack
+                     mrs   r0, spsr                @ get USR CPSR
+                     stmdb sp!, { r0, lr }         @ store USR PC and CPSR
 
+                     mov   r0, sp                  @ set high-level C function arg. = SP
                      bl    hilevel_handler_dab     @ invoke high-level C function
 
-                     ldmfd sp!, { r0-r3, ip, lr }  @ restore caller-save registers
-                     movs  pc, lr                  @ return from interrupt	
+                     ldmia sp!, { r0, lr }         @ load USR mode PC and CPSR
+                     msr   spsr, r0                @ set  USR mode CPSR
+                     ldmia sp, { r0-r12, sp, lr }^ @ load USR mode register
+                     add   sp, sp, #60             @ update DAB mode SP
+                     movs  pc, lr                  @ Switches back to user modesub
+
 

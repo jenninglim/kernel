@@ -15,11 +15,20 @@
 
 #define SIZE 10
 
+/*
+ * This structure is for hashing the PID 
+ * allowing for O(1) expected acess time.
+ * Actual size depends on the SIZE constant
+ * and the number of processes active.
+ */
+
+// Node of HASH TABLE
 typedef struct {
     list_head node;
     task_t * task;
 } pid_node_t;
 
+// Hash table structure.
 typedef struct {
     list_head entry[SIZE];
 } pid_table_t;
