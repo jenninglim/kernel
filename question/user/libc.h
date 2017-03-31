@@ -28,20 +28,18 @@ typedef int pid_t;
  * to act as a limited model of similar concepts.
  */
 
-#define SYS_YIELD     ( 0x00 )
-#define SYS_WRITE     ( 0x01 )
-#define SYS_READ      ( 0x02 )
-#define SYS_FORK      ( 0x03 )
-#define SYS_EXIT      ( 0x04 )
-#define SYS_EXEC      ( 0x05 )
-#define SYS_KILL      ( 0x06 )
-#define SYS_PRIO           ( 0x07 )
-#define SYS_PID            ( 0x08 )
-#define SYS_SEM_OPEN          ( 0x09 )
-#define SYS_SHMEM_OPEN     ( 0x0A ) // Initialise Shared Memory
-#define SYS_SHMEM_CLOSE    ( 0x0B )
-#define SYS_SHMEM_READ     ( 0x0C )
-#define SYS_SHMEM_WRITE    ( 0x0D )
+#define SYS_YIELD           ( 0x00 )
+#define SYS_WRITE           ( 0x01 )
+#define SYS_READ            ( 0x02 )
+#define SYS_FORK            ( 0x03 )
+#define SYS_EXIT            ( 0x04 )
+#define SYS_EXEC            ( 0x05 )
+#define SYS_KILL            ( 0x06 )
+#define SYS_PRIO            ( 0x07 )
+#define SYS_PID             ( 0x08 )
+#define SYS_SEM_OPEN        ( 0x09 )
+#define SYS_SHMEM_OPEN      ( 0x0A ) // Initialise Shared Memory
+#define SYS_SHMEM_CLOSE     ( 0x0B )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -78,20 +76,18 @@ extern void set_prio( int pid, int prio );
 // get pid
 extern int get_pid();
 
-//opennn
+// Create semaphore.
 extern int sem_open( int value);
 
-// increament a semaphore.
+// Increament a semaphore.
 extern void sem_post(int * sem);
 
+// Compare semaphore.
 extern void sem_wait(int * sem);
 
-// open shared memory.
+// Create shared memory.
 extern int shm_open( void * data, int size );
 
-extern int sem_write(int sema_id, void * data);
-
-extern char * sem_read( int sema_id);
 
 
 

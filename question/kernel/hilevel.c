@@ -71,19 +71,24 @@ void hilevel_handler_rst(ctx_t* ctx) {
     // Scheduling runqueue.
     sched_rq(&rq, ctx);
     
-    // Enable IRQ interrupt.
-    int_enable_irq();
+    
+    
     
     // Set current page.
     memcpy(T,rq.current->T, sizeof(uint32_t) * 4096);
     
     //Enable MMU.
     enable_MMU(T);
+    
+    // Enable IRQ interrupt.
+    int_enable_irq();
 
     return;
 }
 
 void hilevel_handler_irq( ctx_t* ctx) {
+    // Disable IRQ interrupt.
+    int_unable_irq();
     
     // FLUSH MMU and disable.
     mmu_flush();
@@ -111,6 +116,9 @@ void hilevel_handler_irq( ctx_t* ctx) {
     
     // Enable MMU.
     mmu_enable();
+    
+    // Enable IRQ interrupt.
+    int_unable_irq();
     return;
 }
 
