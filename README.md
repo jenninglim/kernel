@@ -1,4 +1,5 @@
 # kernel
+Simple kernel in C.
 
 ## Functionality includes:
 * pre-emptive operating system kernel
